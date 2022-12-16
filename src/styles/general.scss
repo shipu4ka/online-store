@@ -16,7 +16,8 @@ $md4:479.98px;
 
 //цвета
 $mainColor: #222; //цвет шрифта
-$bgc: #fff;  //цвет бэграунда
+$bgc: #fff;  //цвет бэграунда 
+$hoverColor: #FF0088;
 
 //для плавного скролла
 html {
@@ -54,6 +55,7 @@ body{
 }
 
 @import "reset.scss";
+@import "header.scss";
 @import "../pages/main/main.scss";
 @import "../pages/description/description.scss";
 @import "../pages/confirm/confirm.scss";
