@@ -1,0 +1,17 @@
+.header {
+  background-color: $bgc;
+
+  &__nav {
+    padding: 30px 0px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__link {
+    color: $mainColor;
+    transition: all 0.3s ease 0s;
+    &:hover{
+      color: $hoverColor;
+    }
+  }
+}
