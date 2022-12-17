@@ -5,6 +5,7 @@ import ConfirmPage from '../../pages/confirm/confirm';
 import CartPage from '../../pages/cart/cart';
 import Header from '../components/header';
 import ErrorPage, { ErrorTypes } from '../../pages/404/404';
+import Footer from '../components/footer';
 
 export const enum PageIds {
   MainPage = 'main-page',
@@ -17,6 +18,7 @@ class App {
   private static root: HTMLElement = document.querySelector('.root')!;
   private initialPage: MainPage;
   private header: Header;
+  private footer: Footer;
 
   static renderNewPage(idPage: string) {
     const content = document.querySelector('.content')!;
@@ -54,12 +56,14 @@ class App {
   constructor() {
     this.initialPage = new MainPage('main-page');
     this.header = new Header('header');
+    this.footer = new Footer('footer');
   }
 
   run() {
     if (App.root && this.initialPage) {
       App.renderNewPage('main-page');
       this.header.render();
+      this.footer.render();
       this.enableRouteChange();
     }
   }
