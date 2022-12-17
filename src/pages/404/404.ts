@@ -7,7 +7,7 @@ class ErrorPage extends Page {
   private errorType: ErrorTypes | string;
 
   static TextObject: { [prop: string]: string } = {
-    '404': '404 Ops! The page is not found!'
+    '404': '404'
   };
 
   constructor(id: string, errorType: ErrorTypes | string) {
@@ -15,9 +15,24 @@ class ErrorPage extends Page {
     this.errorType = errorType;
   }
 
-  render() {
+  renderErrorPage() {
+    const section = this.createPageBlock('section', 'error', 'container');
+
     const title = this.createPageTitle(ErrorPage.TextObject[this.errorType]);
-    this.main?.append(title);
+    title.classList.add('error__title');
+
+    const h2 = this.createPageBlock('h2', 'error__subtitle');
+    h2.textContent = 'Uh-Oh...';
+
+    const p = this.createPageBlock('p', 'error__text');
+    p.textContent = 'The page you are looking for may have been moved, deleted, or possibly never existed';
+    
+    this.main?.append(section);
+    section.append(...[title, h2, p]);
+  }
+
+  render() {
+    this.renderErrorPage();
     return this.main;
   }
 }
