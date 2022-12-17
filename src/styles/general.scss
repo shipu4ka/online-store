@@ -6,7 +6,7 @@ $maxWidthContainer: 1600px;
 
 //натроики шрифта
 $fontFamily: Montserrat;
-$fontSize: 14;
+$fontSize: 16;
 
 //медиа берек-поинты, при каких размерах экрана будет перестраиваться преложение
 $md1:$maxWidthContainer + 12px;
@@ -15,9 +15,11 @@ $md3:767.98px;
 $md4:479.98px;
 
 //цвета
-$mainColor: #222; //цвет шрифта
-$bgc: #fff;  //цвет бэграунда 
+$mainColor: #222222; //цвет шрифта
+$bgc: #ffffff;  //цвет бэграунда 
 $hoverColor: #FF0088;
+
+@import "reset.scss";
 
 //для плавного скролла
 html {
@@ -58,7 +60,6 @@ body{
 	@media (max-width: $md3){max-width: none;padding: 0 10px;}
 }
 
-@import "reset.scss";
 @import "header.scss";
 @import "footer.scss";
 @import "../pages/main/main.scss";
