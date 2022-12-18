@@ -5,6 +5,12 @@ abstract class Component {
     this.element = document.querySelector(`.${className}`)!;
   }
 
+  createComponentBlock(tag: string, className: string) {
+    const block = document.createElement(tag);
+    block.classList.add(className);
+    return block;
+  }
+
   render() {
     return this.element;
   }
