@@ -1,4 +1,4 @@
-import productsList from '../interfaces/productsList'
+import {ProductsList} from '../interfaces/productsList'
 
 abstract class Page {
   protected main: HTMLElement;
@@ -28,9 +28,8 @@ abstract class Page {
 
   protected async getPageData() {
     try {
-      const api = await fetch('https://dummyjson.com/products');
-      const list: productsList = await api.json();
-      return list;
+      const apiData: ProductsList = await fetch('https://dummyjson.com/products').then(res => res.json());
+      return apiData;
     } catch (error) {
       throw new Error('Error: ' + error);
     }
