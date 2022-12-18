@@ -9,9 +9,17 @@ class MainPage extends Page {
     super(id);
   }
 
+  async getProducts() {
+    const data = await this.getPageData();
+    return console.log(data.products);
+  }
+
   render() {
     const title = this.createPageTitle(MainPage.TextObject.MainTitle);
     this.main?.append(title);
+
+    this.getProducts()
+
     return this.main;
   }
 

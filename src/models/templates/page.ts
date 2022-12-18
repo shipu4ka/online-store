@@ -1,3 +1,5 @@
+import {ProductsList} from '../interfaces/productsList'
+
 abstract class Page {
   protected main: HTMLElement;
   static TextObject = {};
@@ -22,7 +24,17 @@ abstract class Page {
       block.classList.add(className2);
     }
     return block;
-  } 
+  }
+
+  protected async getPageData() {
+    try {
+      const apiData: ProductsList = await fetch('https://dummyjson.com/products').then(res => res.json());
+      return apiData;
+    } catch (error) {
+      throw new Error('Error: ' + error);
+    }
+
+  }
 
   render() {
     return this.main;

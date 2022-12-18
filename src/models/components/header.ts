@@ -4,7 +4,7 @@ import { PageIds } from '../app/app';
 const Navigation = [
   {
     id: PageIds.MainPage,
-    text: 'Home',
+    text: '<img src="../../assets/icons/logo.svg" alt="Home page">',
   },
   {
     id: PageIds.DescriptionPage,
@@ -16,7 +16,7 @@ const Navigation = [
   },
   {
     id: PageIds.CartPage,
-    text: 'Cart',
+    text: '<img src="../../assets/icons/cart_empty.svg" alt="Cart">',
   }
 ]
 
@@ -34,11 +34,15 @@ class Header extends Component {
       const navItem = document.createElement('a');
       navItem.classList.add('header__link');
       navItem.href = `#${item.id}`;
-      navItem.textContent = item.text;
+      navItem.innerHTML = item.text;
       pageNav.append(navItem);
     });
 
     this.element.append(pageNav);
+
+    const total = this.createComponentBlock('div', 'header__total');
+    total.textContent = '0';
+    pageNav.append(total);
   }
 
   render() {
