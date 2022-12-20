@@ -1,4 +1,4 @@
-import {ProductsList} from '../interfaces/productsList'
+import { ProductsList } from '../interfaces/productsList';
 
 abstract class Page {
   protected main: HTMLElement;
@@ -28,12 +28,22 @@ abstract class Page {
 
   protected async getPageData() {
     try {
-      const apiData: ProductsList = await fetch('https://dummyjson.com/products').then(res => res.json());
+      const apiData: ProductsList = await fetch('https://dummyjson.com/products').then((res) => res.json());
       return apiData;
     } catch (error) {
       throw new Error('Error: ' + error);
     }
+  }
 
+  protected async getProductsCategories() {
+    try {
+      const apiData: Promise<string[]> = await fetch('https://dummyjson.com/products/categories').then((res) =>
+        res.json()
+      );
+      return apiData;
+    } catch (error) {
+      throw new Error('Error: ' + error);
+    }
   }
 
   render() {

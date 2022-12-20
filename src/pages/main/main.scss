@@ -1,0 +1,38 @@
+.wrapper {
+  display: grid;
+  grid-template-areas: 'filters cards';
+  grid-template-columns: 25% auto;
+  column-gap: 30px;
+  height: 80vh;
+  padding: 0px 10px;
+}
+
+.filters {
+  grid-area: filters;
+  display: grid;
+  background-color: #eee;
+
+  &__buttons {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+  }
+
+  &__button {
+    border: 1px solid $greyColor2;
+    background-color: $bgc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease 0s;
+    &:hover {
+      border: 1px solid $hoverColor;
+      color: $hoverColor;
+    }
+  }
+}
+
+.cards {
+  grid-area: cards;
+  background-color: #eee;
+}
