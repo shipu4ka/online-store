@@ -12,7 +12,7 @@
   &__link {
     color: $mainColor;
     transition: all 0.3s ease 0s;
-    &:hover{
+    &:hover {
       color: $hoverColor;
     }
   }
@@ -24,14 +24,14 @@
     min-width: 25px;
     min-height: 25px;
     padding: 2px;
-    font-weight: 500;
     font-size: 14px;
+    font-weight: 700;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
     background-color: $bgc;
-    border: 1px solid $mainColor;
+    border: 2px solid $mainColor;
     border-radius: 50%;
   }
 }
