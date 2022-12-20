@@ -9,31 +9,32 @@ $fontFamily: Montserrat;
 $fontSize: 16;
 
 //медиа берек-поинты, при каких размерах экрана будет перестраиваться преложение
-$md1:$maxWidthContainer + 12px;
-$md2:992.98px;
-$md3:767.98px;
-$md4:479.98px;
+$md1: $maxWidthContainer + 12px;
+$md2: 992.98px;
+$md3: 767.98px;
+$md4: 479.98px;
 
 //цвета
 $mainColor: #222222; //цвет шрифта
-$bgc: #ffffff;  //цвет бэграунда 
-$hoverColor: #FF0088;
+$bgc: #ffffff; //цвет бэграунда
+$hoverColor: #ff0088;
 $greyColor1: #444444;
 $greyColor2: #665760;
 
-@import "reset.scss";
+@import 'reset.scss';
 
 //для плавного скролла
 html {
   scroll-behavior: smooth;
 }
 
-body{
+body {
   color: $mainColor;
   background: $bgc;
   font-family: $fontFamily;
-  @media (max-width: $md3){
-    &.lock{ //специальный класс, который будет блокировать скролл, если открыты попапы или меню-бургеры
+  @media (max-width: $md3) {
+    &.lock {
+      //специальный класс, который будет блокировать скролл, если открыты попапы или меню-бургеры
       overflow: hidden;
     }
   }
@@ -44,28 +45,39 @@ body{
 }
 
 //врапер, который отцентрует приложение по середине
-.root{
-	min-height: 100%;
-	width: 100%;
-	overflow: hidden;
-	margin: 0 auto;
+.root {
+  min-height: 100%;
+  width: 100%;
+  overflow: hidden;
+  margin: 0 auto;
   font-size: 16px;
-	//для футора, чтобы он всегда был снизу
-	display: flex;
-	flex-direction: column;
+  //для футора, чтобы он всегда был снизу
+  display: flex;
+  flex-direction: column;
 }
 
 //для выравнивания контента внутри root
-.container{max-width: $maxWidthContainer; margin: 0 auto;width: 100%;padding: 0 0px;
-	@media (max-width: $md1){max-width: 970px;}
-	@media (max-width: $md2){max-width: 750px;}
-	@media (max-width: $md3){max-width: none;padding: 0 10px;}
+.container {
+  max-width: $maxWidthContainer;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 0px;
+  @media (max-width: $md1) {
+    max-width: 970px;
+  }
+  @media (max-width: $md2) {
+    max-width: 750px;
+  }
+  @media (max-width: $md3) {
+    max-width: none;
+    padding: 0 10px;
+  }
 }
 
-@import "header.scss";
-@import "footer.scss";
-@import "../pages/main/main.scss";
-@import "../pages/description/description.scss";
-@import "../pages/confirm/confirm.scss";
-@import "../pages/cart/cart.scss";
-@import "../pages/404/404.scss";
+@import 'header.scss';
+@import 'footer.scss';
+@import '../pages/main/main.scss';
+@import '../pages/description/description.scss';
+@import '../pages/confirm/confirm.scss';
+@import '../pages/cart/cart.scss';
+@import '../pages/404/404.scss';
