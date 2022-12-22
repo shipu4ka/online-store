@@ -27,8 +27,8 @@ class ErrorPage extends Page {
     const p = this.createPageBlock('p', 'error__text');
     p.textContent = 'The page you are looking for may have been moved, deleted, or possibly never existed';
     
-    this.main?.append(section);
     section.append(...[title, h2, p]);
+    this.main?.append(section);
   }
 
   render() {

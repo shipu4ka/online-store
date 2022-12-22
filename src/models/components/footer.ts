@@ -31,7 +31,8 @@ class Footer extends Component {
 
         const rssImage = document.createElement('img');
         rssImage.className = 'footer__rss-img';
-        rssImage.src = 'https://rs.school/images/rs_school_js.svg';
+        rssImage.src = '../assets/icons/rslogo-w.svg';
+        rssImage.alt = 'RSS logo';
 
         rssLink.append(rssImage);
 

@@ -1,11 +1,11 @@
 import {ProductsList} from '../interfaces/productsList'
 
 abstract class Page {
-  protected main: HTMLElement;
+  protected main: HTMLElement | null;
   static TextObject = {};
 
   constructor(id: string) {
-    this.main = document.querySelector('.content')!;
+    this.main = document.querySelector('.content');
     if (this.main) {
       this.main.id = id;
     }
