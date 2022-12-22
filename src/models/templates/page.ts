@@ -28,7 +28,7 @@ abstract class Page {
 
   protected async getPageData() {
     try {
-      const apiData: ProductsList = await fetch('https://dummyjson.com/products').then((res) => res.json());
+      const apiData: ProductsList = await fetch('https://dummyjson.com/products?limit=100').then((res) => res.json());
       return apiData;
     } catch (error) {
       throw new Error('Error: ' + error);

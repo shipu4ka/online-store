@@ -16,10 +16,21 @@ $md4: 479.98px;
 
 //цвета
 $mainColor: #222222; //цвет шрифта
-$bgc: #ffffff; //цвет бэграунда
+$bgc: #ffffff;
+$bgc2: #66576021;
 $hoverColor: #ff0088;
 $greyColor1: #444444;
 $greyColor2: #665760;
+
+%greyBorder {
+  border: 1px solid $greyColor2;
+  border-radius: 10px;
+}
+
+%pinkBorder {
+  border: 2px solid $hoverColor;
+  border-radius: 10px;
+}
 
 @import 'reset.scss';
 
