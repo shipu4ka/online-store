@@ -22,9 +22,8 @@ const fakeProduct: Product = {
 }
 
 class DescriptionPage extends Page {
-  static TextObject = {
-    MainTitle: 'Description page'
-  };
+  
+  static isCanAdd = true;
 
   constructor(id: string) {
     super(id);
@@ -146,8 +145,25 @@ class DescriptionPage extends Page {
     return this.main;
   }
 
+  addRemoveToCart() {
+    const cart = document.querySelector('.header__total');
+    const productsInCart = Number(cart?.textContent);
+    const btnAddToCart = document.querySelector('.description__add-cart') as HTMLElement;
+    if (DescriptionPage.isCanAdd) {
+      (cart as HTMLElement).textContent = String(productsInCart + 1);
+      btnAddToCart.textContent = 'remove from cart';
+      DescriptionPage.isCanAdd = false;
+    } else {
+      (cart as HTMLElement).textContent = String(productsInCart - 1);
+      btnAddToCart.textContent = 'add to cart';
+      DescriptionPage.isCanAdd = true;
+    }
+  }
+
 }
 
 
 
+
 export default DescriptionPage;
+
