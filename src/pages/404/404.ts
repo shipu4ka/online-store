@@ -29,6 +29,7 @@ class ErrorPage extends Page {
 
     this.main?.append(section);
     section.append(...[title, h2, p]);
+    this.main?.append(section);
   }
 
   render() {
