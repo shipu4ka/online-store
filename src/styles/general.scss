@@ -17,7 +17,7 @@ $md4: 479.98px;
 //цвета
 $mainColor: #222222; //цвет шрифта
 $bgc: #ffffff;
-$bgc2: #66576021;
+$bgc2: #EBE9EA;
 $hoverColor: #ff0088;
 $greyColor1: #444444;
 $greyColor2: #665760;
@@ -27,9 +27,36 @@ $greyColor2: #665760;
   border-radius: 10px;
 }
 
-%pinkBorder {
-  border: 2px solid $hoverColor;
+%lightGreyBorder {
+  border: 1px solid $bgc2;
   border-radius: 10px;
+}
+
+%pinkBorder {
+  border: 1px solid $hoverColor;
+  border-radius: 10px;
+}
+
+%buttonsWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+%button {
+  color: $greyColor2;
+  background-color: $bgc;
+  outline: 1px solid $greyColor2;
+  border-radius: 10px;
+  font-size: 16px;
+  padding: 10px 10px;
+  transition: all 0.3s ease 0s;
+  min-width: 110px;
+  &:hover {
+    color: $bgc;
+    background-color: $greyColor2;
+  }
 }
 
 @import 'reset.scss';
@@ -82,6 +109,27 @@ body {
   @media (max-width: $md3) {
     max-width: none;
     padding: 0 10px;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background-color: $bgc2;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  height: 50px;
+  border: 3px solid $bgc2;
+  border-radius: 5px;
+  background-color: $greyColor2;
+}
+
+@supports (scrollbar-color: $hoverColor $greyColor2) {
+  * {
+      scrollbar-color: $hoverColor $greyColor2;
+      scrollbar-width: thin;
   }
 }
 

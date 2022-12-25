@@ -1,11 +1,10 @@
 import Page from '../../models/templates/page';
 import * as noUiSlider from 'nouislider';
 import 'nouislider/dist/nouislider.css';
-import { ProductsList } from '../../models/interfaces/productsList';
 
 class MainPage extends Page {
   static TextObject = {
-    MainTitle: 'Home page',
+    MainTitle: 'All Categories',
   };
 
   constructor(id: string) {
@@ -43,18 +42,21 @@ class MainPage extends Page {
 
   async getProducts() {
     const data = await this.getPageData();
-    return console.log(data.products);
+    return data.products;
   }
 
   async getCategories(filters: HTMLElement) {
     const data = await this.getProductsCategories();
+    const filterContainer = this.createPageBlock('div', 'filters__container');
     const title = this.createTitle('Category');
     const categories = this.createCategoriesBlock('filters__categories', 'filters__category', 'filters__total-category', data);
-    filters.append(...[title, categories]);
+    filterContainer.append(...[title, categories]);
+    filters.append(...[filterContainer]);
   }
 
   async getBrand(filters: HTMLElement) {
     const data = await this.getPageData();
+    const filterContainer = this.createPageBlock('div', 'filters__container');
     const title = this.createTitle('Brand');
     const dataProducts = data.products;
     const arrDataProducts: string[] = [];
@@ -76,15 +78,17 @@ class MainPage extends Page {
     //   if (item.name)
     // })
 
-    console.log(arrDataProducts);
-    console.log(uniqArrDataProducts);
+    // console.log(arrDataProducts);
+    // console.log(uniqArrDataProducts);
     // console.log(objDataProducts);
     // console.log(uniq);
 
-    filters.append(...[title, brand]);
+    filterContainer.append(...[title, brand]);
+    filters.append(...[filterContainer]);
   }
 
   createMultiRangeSlider(filters: HTMLElement, titleNode: string, min: string, max: string) {
+    const filterContainer = this.createPageBlock('div', 'filters__container');
     const title = this.createTitle(titleNode);
     const slider = this.createPageBlock('div', 'filters__slider','slider');
     const sliderBody  = this.createPageBlock('div', 'slider__body') as noUiSlider.target;
@@ -147,42 +151,156 @@ class MainPage extends Page {
     label2.append(...[span2, input2]);
     inputs.append(...[label1, label2]);
     slider.append(...[sliderBody, inputs]);
-    filters.append(...[title, slider]);
+    filterContainer.append(...[title, slider]);
+    filters.append(...[filterContainer]);
   }
 
-  createFilters() {
-    const filters = this.createPageBlock('aside', 'filters');
-
+  createFiltersButtons(filters: HTMLElement) {
     const buttons = this.createPageBlock('div', 'filters__buttons');
     const btn1 = this.createPageBlock('button', 'filters__button');
     btn1.textContent = 'Reset Filters';
     const btn2 = this.createPageBlock('button', 'filters__button');
     btn2.textContent = 'Copy Link';
-
     buttons.append(...[btn1, btn2]);
     filters.append(...[buttons]);
+  }
 
+  createFilters() {
+    const filters = this.createPageBlock('aside', 'filters');
+    this.createFiltersButtons(filters);
     this.createMultiRangeSlider(filters, 'Price', '10', '1749');
     this.createMultiRangeSlider(filters, 'Stock', '2', '150');
     this.getCategories(filters);
     this.getBrand(filters);
-
-    // this.createMultiRangeSlider(filters);
-
     return filters;
+  }
+
+  createCardsSelect(sort: HTMLElement) {
+    const select = this.createPageBlock('div', 'sort__select', 'select');
+    const selectText = this.createPageBlock('span', 'select__text');
+    selectText.textContent = 'Sort by:';
+    const selectWrap = this.createPageBlock('div', 'select__wrap');
+    const selectTag = this.createPageBlock('select', 'select__tag');
+    const option = this.createPageBlock('option', 'select__option');
+    option.setAttribute('value', 'allCategories');
+    option.textContent = 'All Categories';
+    const option1 = this.createPageBlock('option', 'select__option');
+    option1.setAttribute('value', 'priceUp');
+    option1.textContent = 'Price up';
+    const option2 = this.createPageBlock('option', 'select__option');
+    option2.setAttribute('value', 'priceDown');
+    option2.textContent = 'Price down';
+    const option3 = this.createPageBlock('option', 'select__option');
+    option3.setAttribute('value', 'discountUp');
+    option3.textContent = 'Discount up';
+    const option4 = this.createPageBlock('option', 'select__option');
+    option4.setAttribute('value', 'discountDown');
+    option4.textContent = 'Discount down';
+    const option5 = this.createPageBlock('option', 'select__option');
+    option5.setAttribute('value', 'ratingUp');
+    option5.textContent = 'Rating up';
+    const option6 = this.createPageBlock('option', 'select__option');
+    option6.setAttribute('value', 'ratingDown');
+    option6.textContent = 'Rating down';
+    selectTag.append(...[option, option1, option2, option3, option4, option5, option6]);
+    selectWrap.append(...[selectTag]);
+    select.append(...[selectText, selectWrap]);
+    sort.append(...[select]);
+  }
+
+  createFound(sort: HTMLElement) {
+    const found = this.createPageBlock('div', 'cards__found');
+    const foundText = this.createPageBlock('span', 'cards__found-text');
+    foundText.textContent = 'Found:';
+    const foundInfo = this.createPageBlock('span', 'cards__found-info');
+    foundInfo.textContent = '100';
+    found.append(...[foundText, foundInfo]);
+    sort.append(...[found]);
+  }
+
+  createSearch(sort: HTMLElement) {
+    const search = this.createPageBlock('div', 'cards__search');
+    const searchInput = this.createPageBlock('input', 'cards__search-input');
+    searchInput.setAttribute('type', 'search');
+    searchInput.setAttribute('placeholder', 'Search product');
+    search.append(...[searchInput]);
+    sort.append(...[search]);
+  }
+
+  createShowMore(sort: HTMLElement) {
+    const show = this.createPageBlock('div', 'cards__show');
+    const showText = this.createPageBlock('div', 'cards__show-text');
+    showText.textContent = 'Show more';
+    show.append(...[showText]);
+    sort.append(...[show]);
+  }
+
+  createCardsSort(cards: HTMLElement) {
+    const sort = this.createPageBlock('div', 'cards__sort', 'sort');
+
+    this.createCardsSelect(sort);
+    this.createFound(sort);
+    this.createSearch(sort);
+    this.createShowMore(sort);
+    cards.append(...[sort]);
+  }
+
+  async createCardsProducts(cards: HTMLElement) {
+    const cardsContainer = this.createPageBlock('div', 'cards__container');
+    const title = this.createPageBlock('h1', 'cards__title', 'title');
+    title.textContent = MainPage.TextObject.MainTitle;
+    const cardsProducts = this.createPageBlock('div', 'cards__products', 'products');
+
+    const data = await this.getPageData();
+    const products = data.products;
+    console.log(data);
+    console.log(products);
+    
+    products.forEach((item) => {
+      const card = this.createPageBlock('div', 'cards__card', 'products__card');
+      const cardTitle = this.createPageBlock('h3', 'products__title');
+      cardTitle.textContent = item.title;
+      const cardItems = this.createPageBlock('div', 'products__items');
+      const cardImage = this.createPageBlock('div', 'products__image');
+      cardImage.style.background = `url('${item.images[0]}') 0 0/cover no-repeat`;
+      const cardText = this.createPageBlock('div', 'products__text');
+      const cardInfo = this.createPageBlock('div', 'products__info');
+      const cardStock = this.createPageBlock('div', 'products__stock');
+      cardStock.textContent = `Stock: ${item.stock}`;
+      const cardPrice = this.createPageBlock('div', 'products__price');
+      cardPrice.textContent = `Price: $ ${item.price}`;
+      const cardDiscount = this.createPageBlock('div', 'products__discount');
+      cardDiscount.textContent = `Discount: ${item.discountPercentage}%`;
+      const cardButtons = this.createPageBlock('div', 'products__buttons');
+      const cardButtonAdd = this.createPageBlock('button', 'products__button','products__add');
+      cardButtonAdd.textContent = "Add to Cart";
+      const cardButtonDetails = this.createPageBlock('button', 'products__button', 'products__details');
+      cardButtonDetails.textContent = 'Details';
+
+      cardButtons.append(...[cardButtonAdd, cardButtonDetails]);
+      cardInfo.append(...[cardStock, cardPrice, cardDiscount]);
+      cardText.append(...[cardInfo, cardButtons]);
+      cardItems.append(...[cardImage, cardText]);
+      card.append(...[cardTitle, cardItems]);
+      cardsProducts.append(...[card]);
+    })
+
+    cardsContainer.append(...[title, cardsProducts]);
+    cards.append(...[cardsContainer]);
   }
 
   createCads() {
     const cards = this.createPageBlock('section', 'cards');
+    this.createCardsSort(cards);
+    this.createCardsProducts(cards);
     return cards;
   }
 
   render() {
-    // const title = this.createPageTitle(MainPage.TextObject.MainTitle);
     const mainWrapper = this.createPageBlock('div', 'wrapper');
     const filters = this.createFilters();
     const cards = this.createCads();
-    mainWrapper.append(...[filters, cards]);
+    mainWrapper.append(...[cards, filters]);
     this.main?.append(mainWrapper);
 
     // this.getProducts();

@@ -1,4 +1,5 @@
 import { ProductsList } from '../interfaces/productsList';
+import ProductsUrlAPI from '../enums/products';
 
 abstract class Page {
   protected main: HTMLElement;
@@ -12,7 +13,7 @@ abstract class Page {
   }
 
   protected createPageTitle(title: string) {
-    const mainTitle = document.createElement('h1');
+    const mainTitle = this.createPageBlock('h1', 'title');
     mainTitle.innerText = title;
     return mainTitle;
   }
@@ -28,7 +29,7 @@ abstract class Page {
 
   protected async getPageData() {
     try {
-      const apiData: ProductsList = await fetch('https://dummyjson.com/products?limit=100').then((res) => res.json());
+      const apiData: ProductsList = await fetch(ProductsUrlAPI.AllProducts).then((res) => res.json());
       return apiData;
     } catch (error) {
       throw new Error('Error: ' + error);
@@ -37,7 +38,7 @@ abstract class Page {
 
   protected async getProductsCategories() {
     try {
-      const apiData: Promise<string[]> = await fetch('https://dummyjson.com/products/categories').then((res) =>
+      const apiData: Promise<string[]> = await fetch(ProductsUrlAPI.ProductsCategories).then((res) =>
         res.json()
       );
       return apiData;
