@@ -22,7 +22,7 @@ const fakeProduct: Product = {
 }
 
 class DescriptionPage extends Page {
-
+  
   static isCanAdd = true;
 
   constructor(id: string) {
@@ -164,4 +164,6 @@ class DescriptionPage extends Page {
 
 
 
+
 export default DescriptionPage;
+

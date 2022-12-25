@@ -1,8 +1,8 @@
-import Page from "../../models/templates/page";
+import Page from '../../models/templates/page';
 
 class CartPage extends Page {
   static TextObject = {
-    MainTitle: 'Cart page'
+    MainTitle: 'Cart page',
   };
 
   constructor(id: string) {
@@ -14,7 +14,6 @@ class CartPage extends Page {
     this.main?.append(title);
     return this.main;
   }
-
 }
 
 export default CartPage;

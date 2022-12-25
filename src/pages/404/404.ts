@@ -1,4 +1,4 @@
-import Page from "../../models/templates/page";
+import Page from '../../models/templates/page';
 
 export const enum ErrorTypes {
   Error404 = 404,
@@ -7,7 +7,7 @@ class ErrorPage extends Page {
   private errorType: ErrorTypes | string;
 
   static TextObject: { [prop: string]: string } = {
-    '404': '404'
+    '404': '404',
   };
 
   constructor(id: string, errorType: ErrorTypes | string) {
@@ -26,7 +26,7 @@ class ErrorPage extends Page {
 
     const p = this.createPageBlock('p', 'error__text');
     p.textContent = 'The page you are looking for may have been moved, deleted, or possibly never existed';
-    
+
     section.append(...[title, h2, p]);
     this.main?.append(section);
   }

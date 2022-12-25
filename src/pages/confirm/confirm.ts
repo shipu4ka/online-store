@@ -1,8 +1,8 @@
-import Page from "../../models/templates/page";
+import Page from '../../models/templates/page';
 
 class ConfirmPage extends Page {
   static TextObject = {
-    MainTitle: 'Confirm page'
+    MainTitle: 'Confirm page',
   };
 
   constructor(id: string) {
@@ -14,7 +14,6 @@ class ConfirmPage extends Page {
     this.main?.append(title);
     return this.main;
   }
-
 }
 
 export default ConfirmPage;

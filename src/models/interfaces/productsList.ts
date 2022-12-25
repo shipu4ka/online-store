@@ -12,7 +12,8 @@ export interface Product {
   images: string[];
 }
 
-export interface ProductsList { // I suggest writing interfaces with a capital letter, so as not to confuse them with variables
+export interface ProductsList {
+  // I suggest writing interfaces with a capital letter, so as not to confuse them with variables
   total: number;
   skip: number;
   limit: number;
