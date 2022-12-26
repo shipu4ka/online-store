@@ -20,24 +20,25 @@ class App {
   private header: Header;
   private footer: Footer;
 
-  static renderNewPage(idPage: string) {
+  static renderNewPage() {
     const content = document.querySelector('.content')!;
     if (content) {
       content.innerHTML = '';
     }
+    const hash = window.location.hash.slice(1);
 
     let page: Page | null = null;
-
-    if (idPage === PageIds.MainPage) {
-      page = new MainPage(idPage);
-    } else if (idPage === PageIds.DescriptionPage) {
-      page = new DescriptionPage(idPage);
-    } else if (idPage === PageIds.ConfirmPage) {
-      page = new ConfirmPage(idPage);
-    } else if (idPage === PageIds.CartPage) {
-      page = new CartPage(idPage);
+    const arrIdPage = hash.split('/');
+    if (hash === PageIds.MainPage) {
+      page = new MainPage(hash);
+    } else if (arrIdPage[0] === PageIds.DescriptionPage) {
+      page = new DescriptionPage(arrIdPage[0], arrIdPage[1]);
+    } else if (hash === PageIds.ConfirmPage) {
+      page = new ConfirmPage(hash);
+    } else if (hash === PageIds.CartPage) {
+      page = new CartPage(hash);
     } else {
-      page = new ErrorPage(idPage, ErrorTypes.Error404);
+      page = new ErrorPage(hash, ErrorTypes.Error404);
     }
 
     if (page && content) {
@@ -48,8 +49,7 @@ class App {
 
   private enableRouteChange() {
     window.addEventListener('hashchange', () => {
-      const hash = window.location.hash.slice(1);
-      App.renderNewPage(hash);
+      App.renderNewPage();
     });
   }
 
@@ -61,7 +61,7 @@ class App {
 
   run() {
     if (App.root && this.initialPage) {
-      App.renderNewPage('main-page');
+      App.renderNewPage();
       this.header.render();
       this.footer.render();
       this.enableRouteChange();
