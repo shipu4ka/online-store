@@ -200,7 +200,7 @@
   &__wrap {
     position: relative;
     display: flex;
-    width: 170px;
+    width: 220px;
     height: 2em;
     line-height: 1.5;
     overflow: hidden;
@@ -231,11 +231,11 @@
     background-color: $greyColor2;
     color: $bgc;
     background-image: none;
-    width: 170px;
+    width: 220px;
     flex: 1;
     padding: 0px 10px;
     cursor: pointer;
-    font-size: inherit;
+    font-size: 14px;
     font-family: inherit;
     &::-ms-expand {
       display: none;

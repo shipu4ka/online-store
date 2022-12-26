@@ -5,6 +5,12 @@ import 'nouislider/dist/nouislider.css';
 class MainPage extends Page {
   static TextObject = {
     MainTitle: 'All Categories',
+    PriceUp: 'Price Range Up',
+    PriceDown: 'Price Range Down',
+    DiscountUp: 'Discount Range Up',
+    DiscountDown: 'Discount Range Down',
+    RatingUp: 'Rating Range Up',
+    RatingDown: 'Rating Range Down',
   };
 
   constructor(id: string) {
@@ -180,32 +186,44 @@ class MainPage extends Page {
     const selectText = this.createPageBlock('span', 'select__text');
     selectText.textContent = 'Sort by:';
     const selectWrap = this.createPageBlock('div', 'select__wrap');
-    const selectTag = this.createPageBlock('select', 'select__tag');
+    const selectTag = this.createPageBlock('select', 'select__tag') as HTMLSelectElement;
     const option = this.createPageBlock('option', 'select__option');
-    option.setAttribute('value', 'allCategories');
-    option.textContent = 'All Categories';
+    option.setAttribute('value', MainPage.TextObject.MainTitle);
+    option.textContent = MainPage.TextObject.MainTitle;
     const option1 = this.createPageBlock('option', 'select__option');
-    option1.setAttribute('value', 'priceUp');
-    option1.textContent = 'Price up';
+    option1.setAttribute('value', MainPage.TextObject.PriceUp);
+    option1.textContent = MainPage.TextObject.PriceUp;
     const option2 = this.createPageBlock('option', 'select__option');
-    option2.setAttribute('value', 'priceDown');
-    option2.textContent = 'Price down';
+    option2.setAttribute('value', MainPage.TextObject.PriceDown);
+    option2.textContent = MainPage.TextObject.PriceDown;
     const option3 = this.createPageBlock('option', 'select__option');
-    option3.setAttribute('value', 'discountUp');
-    option3.textContent = 'Discount up';
+    option3.setAttribute('value', MainPage.TextObject.DiscountUp);
+    option3.textContent = MainPage.TextObject.DiscountUp;
     const option4 = this.createPageBlock('option', 'select__option');
-    option4.setAttribute('value', 'discountDown');
-    option4.textContent = 'Discount down';
+    option4.setAttribute('value', MainPage.TextObject.DiscountDown);
+    option4.textContent = MainPage.TextObject.DiscountDown;
     const option5 = this.createPageBlock('option', 'select__option');
-    option5.setAttribute('value', 'ratingUp');
-    option5.textContent = 'Rating up';
+    option5.setAttribute('value', MainPage.TextObject.RatingUp);
+    option5.textContent = MainPage.TextObject.RatingUp;
     const option6 = this.createPageBlock('option', 'select__option');
-    option6.setAttribute('value', 'ratingDown');
-    option6.textContent = 'Rating down';
+    option6.setAttribute('value', MainPage.TextObject.RatingDown);
+    option6.textContent = MainPage.TextObject.RatingDown;
     selectTag.append(...[option, option1, option2, option3, option4, option5, option6]);
     selectWrap.append(...[selectTag]);
     select.append(...[selectText, selectWrap]);
     sort.append(...[select]);
+
+    if (selectTag.value) {
+      selectTag.addEventListener('change', (e) => {
+        const target = e.target as HTMLOptionElement;
+        const title = document.querySelector('.cards__title') as HTMLElement;
+        if (target && title) {
+          let text = target.value;
+          title.textContent = 'Sorted by ' + text;
+          console.log(target.value);
+        }
+      })
+    }
   }
 
   createFound(sort: HTMLElement) {
