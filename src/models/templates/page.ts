@@ -1,4 +1,4 @@
-import { ProductsList } from '../interfaces/productsList';
+import { Product, ProductsList } from '../interfaces/productsList';
 import ProductsUrlAPI from '../enums/products';
 
 abstract class Page {
@@ -30,6 +30,15 @@ abstract class Page {
   protected async getPageData() {
     try {
       const apiData: ProductsList = await fetch(ProductsUrlAPI.AllProducts).then((res) => res.json());
+      return apiData;
+    } catch (error) {
+      throw new Error('Error: ' + error);
+    }
+  }
+
+  protected async getProductById(id: string) {
+    try {
+      const apiData: Product = await fetch(`${ProductsUrlAPI.Product}/${id}`).then((res) => res.json());
       return apiData;
     } catch (error) {
       throw new Error('Error: ' + error);
