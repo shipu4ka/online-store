@@ -1,6 +1,7 @@
 import Page from '../../models/templates/page';
 import * as noUiSlider from 'nouislider';
 import 'nouislider/dist/nouislider.css';
+import { PageIds } from '../../models/app/app';
 
 class MainPage extends Page {
   static TextObject = {
@@ -294,6 +295,9 @@ class MainPage extends Page {
       cardButtonAdd.textContent = "Add to Cart";
       const cardButtonDetails = this.createPageBlock('button', 'products__button', 'products__details');
       cardButtonDetails.textContent = 'Details';
+      cardButtonDetails.onclick = function () {
+        window.location.hash = `${PageIds.DescriptionPage}/${item.id}`;
+      }
 
       cardButtons.append(...[cardButtonAdd, cardButtonDetails]);
       cardInfo.append(...[cardStock, cardPrice, cardDiscount]);

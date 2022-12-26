@@ -7,10 +7,6 @@ const Navigation = [
     text: '<img src="../../assets/icons/logo.svg" alt="Home page">',
   },
   {
-    id: PageIds.DescriptionPage,
-    text: 'Description',
-  },
-  {
     id: PageIds.ConfirmPage,
     text: 'Confirm',
   },
@@ -38,9 +34,8 @@ class Header extends Component {
     pageNav.classList.add('container');
 
     const logo = this.createNavElement(0);
-    const description = this.createNavElement(1);
-    const confirm = this.createNavElement(2);
-    const cart = this.createNavElement(3);
+    const confirm = this.createNavElement(1);
+    const cart = this.createNavElement(2);
 
     const sumBlock = this.createComponentBlock('div', 'header__sum');
     const sumText = this.createComponentBlock('span', 'header__sum-text');
@@ -52,7 +47,7 @@ class Header extends Component {
     const total = this.createComponentBlock('div', 'header__total');
     total.textContent = '0';
 
-    pageNav.append(...[logo, sumBlock, description, confirm, cart, total]);
+    pageNav.append(...[logo, sumBlock, confirm, cart, total]);
 
     this.element.append(pageNav);
   }
