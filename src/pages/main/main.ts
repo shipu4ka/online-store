@@ -293,6 +293,30 @@ class MainPage extends Page {
       cardPrice.textContent = `Price: $ ${item.price}`;
       const cardDiscount = this.createPageBlock('div', 'products__discount');
       cardDiscount.textContent = `Discount: ${item.discountPercentage}%`;
+
+      const cardRating = this.createPageBlock('div', 'products__rating', 'rating');
+      const cardRatingBody = this.createPageBlock('div', 'rating__body');
+      const cardRatingActive = this.createPageBlock('div', 'rating__active');
+      const cardRatingItems = this.createPageBlock('div', 'rating__items');
+
+      for (let i = 0; i < 5; i += 1) {
+        const item = this.createPageBlock('input', 'rating__item');
+        item.setAttribute('type', 'radio');
+        item.setAttribute('value', `${i + 1}`);
+        item.setAttribute('name', 'rating');
+        cardRatingItems.append(item);
+      }
+
+      const cardRatingValue = this.createPageBlock('div', 'rating__value');
+      cardRatingValue.textContent = `${item.rating}`;
+    
+      function setRating(index: string = cardRatingValue.innerHTML) {
+        const ratingActiveWidth = Number(index) / 0.05;
+        cardRatingActive.style.width = `${ratingActiveWidth}%`;
+      }
+
+      setRating();
+
       const cardButtons = this.createPageBlock('div', 'products__buttons');
       const cardButtonAdd = this.createPageBlock('button', 'products__button','products__add');
       cardButtonAdd.textContent = "Add to Cart";
@@ -303,7 +327,9 @@ class MainPage extends Page {
       }
 
       cardButtons.append(...[cardButtonAdd, cardButtonDetails]);
-      cardInfo.append(...[cardStock, cardPrice, cardDiscount]);
+      cardRatingBody.append(...[cardRatingActive, cardRatingItems]);
+      cardRating.append(...[cardRatingBody, cardRatingValue]);
+      cardInfo.append(...[cardStock, cardPrice, cardDiscount, cardRating]);
       cardText.append(...[cardInfo, cardButtons]);
       cardItems.append(...[cardImage, cardText]);
       card.append(...[cardTitle, cardItems]);
