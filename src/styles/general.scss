@@ -47,7 +47,7 @@ $greyColor2: #665760;
 %button {
   color: $greyColor2;
   background-color: $bgc;
-  outline: 1px solid $greyColor2;
+  border: 1px solid $greyColor2;
   border-radius: 10px;
   font-size: 16px;
   padding: 10px 10px;
@@ -56,6 +56,10 @@ $greyColor2: #665760;
   &:hover {
     color: $bgc;
     background-color: $greyColor2;
+    border: 1px solid $greyColor2;
+  }
+  &:active {
+    border: 1px solid $greyColor2;
   }
 }
 

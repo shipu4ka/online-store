@@ -164,23 +164,46 @@ class MainPage extends Page {
     filters.append(...[filterContainer]);
   }
 
-  createFiltersButtons(filters: HTMLElement) {
-    const buttons = this.createPageBlock('div', 'filters__buttons');
+  async createFiltersButtons(buttons: HTMLElement) {
+    const data = await this.getPageData();
+    let products = data.products;
+
     const btn1 = this.createPageBlock('button', 'filters__button');
     btn1.textContent = 'Reset Filters';
     const btn2 = this.createPageBlock('button', 'filters__button');
     btn2.textContent = 'Copy Link';
     buttons.append(...[btn1, btn2]);
-    filters.append(...[buttons]);
+
+    btn1.addEventListener('click', () => {
+      const cards = document.querySelector('.cards') as HTMLElement;
+      cards.dataset.filter = Filters.Default;
+
+      const cardsTitle = document.querySelector('.cards__title') as HTMLElement;
+      cardsTitle.textContent = MainPage.TextObject.Default;
+
+      const selectTag = document.querySelector('.select__tag') as HTMLSelectElement;
+      selectTag.selectedIndex = 0;
+
+      const cardsProducts = document.querySelector('.cards__products') as HTMLElement;
+      cardsProducts.innerHTML = '';
+      this.filterCards(products, cardsProducts);
+    })
+
+    return buttons;
   }
 
   createFilters() {
     const filters = this.createPageBlock('aside', 'filters');
-    this.createFiltersButtons(filters);
+
+    const buttons = this.createPageBlock('div', 'filters__buttons');
+    this.createFiltersButtons(buttons);
+    filters.append(...[buttons]);
+
     this.createMultiRangeSlider(filters, 'Price', '10', '1749');
     this.createMultiRangeSlider(filters, 'Stock', '2', '150');
     this.getCategories(filters);
     this.getBrand(filters);
+
     return filters;
   }
 
