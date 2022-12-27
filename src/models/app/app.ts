@@ -29,8 +29,9 @@ class App {
 
     let page: Page | null = null;
     const arrIdPage = hash.split('/');
-    if (hash === PageIds.MainPage) {
+    if (arrIdPage[0] === '' || hash === PageIds.MainPage) {
       page = new MainPage(hash);
+      console.log(hash);
     } else if (arrIdPage[0] === PageIds.DescriptionPage) {
       page = new DescriptionPage(arrIdPage[0], arrIdPage[1]);
     } else if (hash === PageIds.ConfirmPage) {
