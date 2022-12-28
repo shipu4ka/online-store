@@ -1,4 +1,4 @@
-enum Filters {
+export enum Filters {
   Default = 'default',
   PriceUp = 'priceUp',
   PriceDown = 'priceDown',
@@ -8,4 +8,12 @@ enum Filters {
   RatingDown = 'ratingDown',
 }
 
-export default Filters;
+export enum FiltersId {
+  Default,
+  PriceUp,
+  PriceDown,
+  DiscountUp,
+  DiscountDown,
+  RatingUp,
+  RatingDown,
+}

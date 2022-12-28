@@ -2,7 +2,7 @@ import Page from '../../models/templates/page';
 import * as noUiSlider from 'nouislider';
 import 'nouislider/dist/nouislider.css';
 import { PageIds } from '../../models/app/app';
-import Filters from '../../models/enums/filters';
+import { Filters, FiltersId } from '../../models/enums/filters';
 import { Product } from '../../models/interfaces/productsList';
 
 class MainPage extends Page {
@@ -187,6 +187,8 @@ class MainPage extends Page {
       const cardsProducts = document.querySelector('.cards__products') as HTMLElement;
       cardsProducts.innerHTML = '';
       this.filterCards(products, cardsProducts);
+
+      localStorage.clear();
     })
 
     return buttons;
@@ -238,6 +240,12 @@ class MainPage extends Page {
     selectWrap.append(...[selectTag]);
     select.append(...[selectText, selectWrap]);
     sort.append(...[select]);
+
+    const cardsFilter = localStorage.getItem('filter');
+      if (cardsFilter) {
+        const cardsFilterParse = JSON.parse(cardsFilter);
+        selectTag.selectedIndex = Number(cardsFilterParse[0]);
+      }
   }
 
   createFound(sort: HTMLElement) {
@@ -345,6 +353,14 @@ class MainPage extends Page {
 
     const data = await this.getPageData();
     let products = data.products;
+
+    const cardsFilter = localStorage.getItem('filter');
+
+    if (cardsFilter) {
+      const cardsFilterParse = JSON.parse(cardsFilter);
+      cards.dataset.filter = cardsFilterParse[1];
+      sortCards(cardsFilterParse[1]);
+    }
     this.filterCards(products, cardsProducts);
     // console.log(data);
     // console.log(products);
@@ -377,6 +393,53 @@ class MainPage extends Page {
       return arr.sort((a, b) => a.id > b.id ? 1 : -1);
     }
 
+    function sortCards(value: string) {
+      switch(value) {
+        case Filters.Default:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.Default;
+          products = sortDefault(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.Default, Filters.Default]));
+          break
+        case Filters.PriceUp:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.PriceUp;
+          products = sortByPriceUp(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.PriceUp, Filters.PriceUp]));
+          break
+        case Filters.PriceDown:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.PriceDown;
+          products = sortByPriceDown(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.PriceDown, Filters.PriceDown]));
+          break
+        case Filters.DiscountUp:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.DiscountUp;
+          products = sortByDiscountUp(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.DiscountUp, Filters.DiscountUp]));
+          break
+        case Filters.DiscountDown:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.DiscountDown;
+          products = sortByDiscountDown(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.DiscountDown, Filters.DiscountDown]));
+          break
+        case Filters.RatingUp:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.RatingUp;
+          products = sortByRatingUp(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.RatingUp, Filters.RatingUp]));
+          break
+        case Filters.RatingDown:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.RatingDown;
+          products = sortByRatingDown(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.RatingDown, Filters.RatingDown]));
+          break
+      }
+    }
+
     const sortSelect = document.querySelector('.select__tag') as HTMLSelectElement;
 
     if (sortSelect.value) {
@@ -386,51 +449,8 @@ class MainPage extends Page {
 
         if (target && title) {
           cards.dataset.filter = targetValue;
-
-          switch(targetValue) {
-            case Filters.PriceUp:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.PriceUp;
-              products = sortByPriceUp(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            case Filters.PriceDown:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.PriceDown;
-              products = sortByPriceDown(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            case Filters.DiscountUp:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.DiscountUp;
-              products = sortByDiscountUp(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            case Filters.DiscountDown:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.DiscountDown;
-              products = sortByDiscountDown(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            case Filters.RatingUp:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.RatingUp;
-              products = sortByRatingUp(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            case Filters.RatingDown:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.RatingDown;
-              products = sortByRatingDown(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            default:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.Default;
-              products = sortDefault(data.products);
-              this.filterCards(products, cardsProducts);
-              console.log(products);
-          }
+          sortCards(targetValue);
+          this.filterCards(products, cardsProducts);
         }
       })
     }
