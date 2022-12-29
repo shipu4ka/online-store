@@ -12,6 +12,10 @@ export interface Product {
   images: string[];
 }
 
+export interface ProductInCart extends Product {
+  count?: number;
+}
+
 export interface ProductsList {
   // I suggest writing interfaces with a capital letter, so as not to confuse them with variables
   total: number;

@@ -15,6 +15,9 @@ class MainPage extends Page {
     RatingUp: 'Rating Range Up',
     RatingDown: 'Rating Range Down',
   };
+  
+  static arrProductsInCart: Product[] = [];
+
 
   constructor(id: string) {
     super(id);
@@ -296,6 +299,15 @@ class MainPage extends Page {
       const cardButtons = this.createPageBlock('div', 'products__buttons');
       const cardButtonAdd = this.createPageBlock('button', 'products__button','products__add');
       cardButtonAdd.textContent = "Add to Cart";
+
+      cardButtonAdd.onclick = () => {
+        const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '[]');
+        productsInCart.push(item);
+        localStorage.setItem('products_in_cart', JSON.stringify(productsInCart));
+        const cart = document.querySelector('.header__total');
+        (cart as HTMLElement).textContent = productsInCart.length;
+      }
+
       const cardButtonDetails = this.createPageBlock('button', 'products__button', 'products__details');
       cardButtonDetails.textContent = 'Details';
       cardButtonDetails.onclick = function () {

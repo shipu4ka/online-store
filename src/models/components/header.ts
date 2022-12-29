@@ -45,7 +45,9 @@ class Header extends Component {
     sumBlock.append(...[sumText, sum]);
 
     const total = this.createComponentBlock('div', 'header__total');
-    total.textContent = '0';
+    const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '[]');
+    
+    total.textContent = productsInCart.length;
 
     pageNav.append(...[logo, sumBlock, confirm, cart, total]);
 
