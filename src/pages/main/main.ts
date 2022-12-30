@@ -189,6 +189,14 @@ class MainPage extends Page {
       this.filterCards(products, cardsProducts);
 
       localStorage.clear();
+
+      const location =  window.location.href;
+      const arrIdPage = location.split('#');
+      const lastItem = arrIdPage[arrIdPage.length - 1];
+
+      if (lastItem !== 'main-page') {
+        window.location.href = location.replace(lastItem, 'main-page');
+      }
     })
 
     return buttons;
@@ -245,6 +253,8 @@ class MainPage extends Page {
       if (cardsFilter) {
         const cardsFilterParse = JSON.parse(cardsFilter);
         selectTag.selectedIndex = Number(cardsFilterParse[0]);
+      } else {
+        selectTag.selectedIndex = 0;
       }
   }
 
@@ -354,6 +364,15 @@ class MainPage extends Page {
     const data = await this.getPageData();
     let products = data.products;
 
+    const hash =  window.location.hash.slice(1);
+    const arrIdPage = hash.split('/');
+    const lastItem = arrIdPage[arrIdPage.length - 1];
+    if(lastItem) {
+      sortCards(lastItem);
+    }
+    // console.log(location);
+    // console.log(arrIdPage);
+
     const cardsFilter = localStorage.getItem('filter');
 
     if (cardsFilter) {
@@ -447,6 +466,50 @@ class MainPage extends Page {
         const target = e.target as HTMLOptionElement;
         const targetValue = target.value;
 
+        const location =  window.location.href;
+        const hash = window.location.hash.slice(1);
+        const arrIdPage = hash.split('/');
+        const lastItem = arrIdPage[arrIdPage.length - 1];
+
+        let regexp: RegExp;
+
+        switch(lastItem) {
+          case '':
+            window.location.href = `${location}#main-page/${targetValue}`;
+            break
+          case 'main-page':
+            window.location.href = `${location}/${targetValue}`
+            break
+          case Filters.Default:
+            regexp = /default/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.PriceUp:
+            regexp = /price-up/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.PriceDown:
+            regexp = /price-down/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.DiscountUp:
+            regexp = /discount-up/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.DiscountDown:
+            regexp = /discount-down/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.RatingUp:
+            regexp = /rating-up/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.RatingDown:
+            regexp = /rating-down/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+        }
+
         if (target && title) {
           cards.dataset.filter = targetValue;
           sortCards(targetValue);
@@ -471,6 +534,7 @@ class MainPage extends Page {
     const mainWrapper = this.createPageBlock('div', 'wrapper');
     const filters = this.createFilters();
     const cards = this.createCads();
+
     mainWrapper.append(...[cards, filters]);
     this.main?.append(mainWrapper);
 
