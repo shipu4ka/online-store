@@ -2,7 +2,7 @@ import Page from '../../models/templates/page';
 import * as noUiSlider from 'nouislider';
 import 'nouislider/dist/nouislider.css';
 import { PageIds } from '../../models/app/app';
-import Filters from '../../models/enums/filters';
+import { Filters, FiltersId } from '../../models/enums/filters';
 import { Product } from '../../models/interfaces/productsList';
 
 class MainPage extends Page {
@@ -187,6 +187,16 @@ class MainPage extends Page {
       const cardsProducts = document.querySelector('.cards__products') as HTMLElement;
       cardsProducts.innerHTML = '';
       this.filterCards(products, cardsProducts);
+
+      localStorage.removeItem('filter');
+
+      const location =  window.location.href;
+      const arrIdPage = location.split('#');
+      const lastItem = arrIdPage[arrIdPage.length - 1];
+
+      if (lastItem !== 'main-page') {
+        window.location.href = location.replace(lastItem, 'main-page');
+      }
     })
 
     return buttons;
@@ -238,6 +248,14 @@ class MainPage extends Page {
     selectWrap.append(...[selectTag]);
     select.append(...[selectText, selectWrap]);
     sort.append(...[select]);
+
+    const cardsFilter = localStorage.getItem('filter');
+      if (cardsFilter) {
+        const cardsFilterParse = JSON.parse(cardsFilter);
+        selectTag.selectedIndex = Number(cardsFilterParse[0]);
+      } else {
+        selectTag.selectedIndex = 0;
+      }
   }
 
   createFound(sort: HTMLElement) {
@@ -293,6 +311,30 @@ class MainPage extends Page {
       cardPrice.textContent = `Price: $ ${item.price}`;
       const cardDiscount = this.createPageBlock('div', 'products__discount');
       cardDiscount.textContent = `Discount: ${item.discountPercentage}%`;
+
+      const cardRating = this.createPageBlock('div', 'products__rating', 'rating');
+      const cardRatingBody = this.createPageBlock('div', 'rating__body');
+      const cardRatingActive = this.createPageBlock('div', 'rating__active');
+      const cardRatingItems = this.createPageBlock('div', 'rating__items');
+
+      for (let i = 0; i < 5; i += 1) {
+        const item = this.createPageBlock('input', 'rating__item');
+        item.setAttribute('type', 'radio');
+        item.setAttribute('value', `${i + 1}`);
+        item.setAttribute('name', 'rating');
+        cardRatingItems.append(item);
+      }
+
+      const cardRatingValue = this.createPageBlock('div', 'rating__value');
+      cardRatingValue.textContent = `${item.rating}`;
+    
+      function setRating(index: string = cardRatingValue.innerHTML) {
+        const ratingActiveWidth = Number(index) / 0.05;
+        cardRatingActive.style.width = `${ratingActiveWidth}%`;
+      }
+
+      setRating();
+
       const cardButtons = this.createPageBlock('div', 'products__buttons');
       const cardButtonAdd = this.createPageBlock('button', 'products__button','products__add');
       cardButtonAdd.textContent = "Add to Cart";
@@ -303,7 +345,9 @@ class MainPage extends Page {
       }
 
       cardButtons.append(...[cardButtonAdd, cardButtonDetails]);
-      cardInfo.append(...[cardStock, cardPrice, cardDiscount]);
+      cardRatingBody.append(...[cardRatingActive, cardRatingItems]);
+      cardRating.append(...[cardRatingBody, cardRatingValue]);
+      cardInfo.append(...[cardStock, cardPrice, cardDiscount, cardRating]);
       cardText.append(...[cardInfo, cardButtons]);
       cardItems.append(...[cardImage, cardText]);
       card.append(...[cardTitle, cardItems]);
@@ -319,6 +363,23 @@ class MainPage extends Page {
 
     const data = await this.getPageData();
     let products = data.products;
+
+    const hash =  window.location.hash.slice(1);
+    const arrIdPage = hash.split('/');
+    const lastItem = arrIdPage[arrIdPage.length - 1];
+    if(lastItem) {
+      sortCards(lastItem);
+    }
+    // console.log(location);
+    // console.log(arrIdPage);
+
+    const cardsFilter = localStorage.getItem('filter');
+
+    if (cardsFilter) {
+      const cardsFilterParse = JSON.parse(cardsFilter);
+      cards.dataset.filter = cardsFilterParse[1];
+      sortCards(cardsFilterParse[1]);
+    }
     this.filterCards(products, cardsProducts);
     // console.log(data);
     // console.log(products);
@@ -351,6 +412,53 @@ class MainPage extends Page {
       return arr.sort((a, b) => a.id > b.id ? 1 : -1);
     }
 
+    function sortCards(value: string) {
+      switch(value) {
+        case Filters.Default:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.Default;
+          products = sortDefault(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.Default, Filters.Default]));
+          break
+        case Filters.PriceUp:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.PriceUp;
+          products = sortByPriceUp(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.PriceUp, Filters.PriceUp]));
+          break
+        case Filters.PriceDown:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.PriceDown;
+          products = sortByPriceDown(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.PriceDown, Filters.PriceDown]));
+          break
+        case Filters.DiscountUp:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.DiscountUp;
+          products = sortByDiscountUp(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.DiscountUp, Filters.DiscountUp]));
+          break
+        case Filters.DiscountDown:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.DiscountDown;
+          products = sortByDiscountDown(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.DiscountDown, Filters.DiscountDown]));
+          break
+        case Filters.RatingUp:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.RatingUp;
+          products = sortByRatingUp(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.RatingUp, Filters.RatingUp]));
+          break
+        case Filters.RatingDown:
+          cardsProducts.innerHTML = '';
+          title.textContent = MainPage.TextObject.RatingDown;
+          products = sortByRatingDown(data.products);
+          localStorage.setItem('filter', JSON.stringify([FiltersId.RatingDown, Filters.RatingDown]));
+          break
+      }
+    }
+
     const sortSelect = document.querySelector('.select__tag') as HTMLSelectElement;
 
     if (sortSelect.value) {
@@ -358,53 +466,54 @@ class MainPage extends Page {
         const target = e.target as HTMLOptionElement;
         const targetValue = target.value;
 
+        const location =  window.location.href;
+        const hash = window.location.hash.slice(1);
+        const arrIdPage = hash.split('/');
+        const lastItem = arrIdPage[arrIdPage.length - 1];
+
+        let regexp: RegExp;
+
+        switch(lastItem) {
+          case '':
+            window.location.href = `${location}#main-page/${targetValue}`;
+            break
+          case 'main-page':
+            window.location.href = `${location}/${targetValue}`
+            break
+          case Filters.Default:
+            regexp = /default/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.PriceUp:
+            regexp = /price-up/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.PriceDown:
+            regexp = /price-down/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.DiscountUp:
+            regexp = /discount-up/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.DiscountDown:
+            regexp = /discount-down/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.RatingUp:
+            regexp = /rating-up/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+          case Filters.RatingDown:
+            regexp = /rating-down/g;
+            window.location.href = location.replace(regexp, targetValue);
+            break
+        }
+
         if (target && title) {
           cards.dataset.filter = targetValue;
-
-          switch(targetValue) {
-            case Filters.PriceUp:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.PriceUp;
-              products = sortByPriceUp(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            case Filters.PriceDown:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.PriceDown;
-              products = sortByPriceDown(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            case Filters.DiscountUp:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.DiscountUp;
-              products = sortByDiscountUp(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            case Filters.DiscountDown:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.DiscountDown;
-              products = sortByDiscountDown(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            case Filters.RatingUp:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.RatingUp;
-              products = sortByRatingUp(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            case Filters.RatingDown:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.RatingDown;
-              products = sortByRatingDown(data.products);
-              this.filterCards(products, cardsProducts);
-              break
-            default:
-              cardsProducts.innerHTML = '';
-              title.textContent = MainPage.TextObject.Default;
-              products = sortDefault(data.products);
-              this.filterCards(products, cardsProducts);
-              console.log(products);
-          }
+          sortCards(targetValue);
+          this.filterCards(products, cardsProducts);
         }
       })
     }
@@ -425,6 +534,7 @@ class MainPage extends Page {
     const mainWrapper = this.createPageBlock('div', 'wrapper');
     const filters = this.createFilters();
     const cards = this.createCads();
+
     mainWrapper.append(...[cards, filters]);
     this.main?.append(mainWrapper);
 

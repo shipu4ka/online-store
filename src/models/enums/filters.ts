@@ -1,11 +1,19 @@
-enum Filters {
+export enum Filters {
   Default = 'default',
-  PriceUp = 'priceUp',
-  PriceDown = 'priceDown',
-  DiscountUp = 'discountUp',
-  DiscountDown = 'discountDown',
-  RatingUp = 'ratingUp',
-  RatingDown = 'ratingDown',
+  PriceUp = 'price-up',
+  PriceDown = 'price-down',
+  DiscountUp = 'discount-up',
+  DiscountDown = 'discount-down',
+  RatingUp = 'rating-up',
+  RatingDown = 'rating-down',
 }
 
-export default Filters;
+export enum FiltersId {
+  Default,
+  PriceUp,
+  PriceDown,
+  DiscountUp,
+  DiscountDown,
+  RatingUp,
+  RatingDown,
+}
