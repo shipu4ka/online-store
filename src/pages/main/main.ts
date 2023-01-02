@@ -188,7 +188,7 @@ class MainPage extends Page {
       cardsProducts.innerHTML = '';
       this.filterCards(products, cardsProducts);
 
-      localStorage.clear();
+      localStorage.removeItem('filter');
 
       const location =  window.location.href;
       const arrIdPage = location.split('#');
