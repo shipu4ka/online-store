@@ -1,5 +1,7 @@
 import Component from '../templates/components';
 import { PageIds } from '../app/app';
+import { Product } from '../interfaces/productsList';
+import { ObjInCart } from '../../pages/cart/cart';
 
 const Navigation = [
   {
@@ -29,6 +31,12 @@ class Header extends Component {
   }
 
   renderPageNav() {
+    const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+    const arrValue = Object.values(productsInCart) as ObjInCart[];
+
+    const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
+    const totalQty = arrValue.reduce((acc: number, item: ObjInCart) => acc + item.count, 0);
+
     const pageNav = document.createElement('nav');
     pageNav.classList.add('header__nav');
     pageNav.classList.add('container');
@@ -41,13 +49,13 @@ class Header extends Component {
     const sumText = this.createComponentBlock('span', 'header__sum-text');
     const sum = this.createComponentBlock('span', 'header__sum-total');
     sumText.textContent = 'Cart total: $';
-    sum.textContent = '0.00';
+    
+    sum.textContent = String(totalCost);
     sumBlock.append(...[sumText, sum]);
 
     const total = this.createComponentBlock('div', 'header__total');
-    const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '[]');
     
-    total.textContent = productsInCart.length;
+    total.textContent = String(totalQty);
 
     pageNav.append(...[logo, sumBlock, confirm, cart, total]);
 

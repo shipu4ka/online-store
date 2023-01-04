@@ -1,9 +1,17 @@
 import { Product, ProductInCart } from "../../models/interfaces/productsList";
 import Page from "../../models/templates/page";
 
+interface ProductsInCart {
+  [key: string]: ObjInCart
+}
+
+export interface ObjInCart {
+  count: number;
+  product: Product;
+}
+
 class CartPage extends Page {
 
-  static arrDiscount: string[] = [];
 
   constructor(id: string) {
     super(id);
@@ -24,13 +32,21 @@ class CartPage extends Page {
     title.textContent = 'Products in cart';
 
     const item = this.createPageBlock('label', 'products-header__parameter') as HTMLLabelElement;
-    item.textContent = 'item:';
+    item.textContent = 'limit:';
     item.htmlFor = 'item';
 
+    let limit = localStorage.getItem('limit') || 3;
+    let offset = 0;
+    let currentPage = localStorage.getItem('currentPage') || 1;
     const itemValue = this.createPageBlock('input', 'products-header__value') as HTMLInputElement;
     itemValue.id = 'item';
-    itemValue.value = '0';
+    itemValue.value = String(limit);
     itemValue.type = 'number';
+    itemValue.oninput = (e) => {
+      const target = e.target as HTMLInputElement;
+      localStorage.setItem('limit', target.value);
+      renderProductList();
+    }
 
     const pagination = this.createPageBlock('label', 'products-header__parameter') as HTMLLabelElement;
     pagination.textContent = 'page:';
@@ -39,15 +55,31 @@ class CartPage extends Page {
     const btnArrow1 = this.createPageBlock('img', 'products-header__arrow') as HTMLImageElement;
     btnArrow1.src = '../assets/icons/arrow_reverse.svg';
     btnArrow1.alt = 'Arrow';
+    btnArrow1.onclick = () => {
+      let currentPage = localStorage.getItem('currentPage') || 1;
+      if (currentPage > 1) {
+        const nextPage = Number(currentPage) - 1;
+        localStorage.setItem('currentPage', `${nextPage}`);
+        renderProductList();
+      }
+    }
 
     const pages = this.createPageBlock('input', 'products-header__pages') as HTMLInputElement;
     pages.id = 'pagination';
-    pages.value = '1/1';
     pages.disabled = true;
 
     const btnArrow2 = this.createPageBlock('img', 'products-header__arrow') as HTMLImageElement;
     btnArrow2.src = '../assets/icons/arrow.svg';
     btnArrow2.alt = 'Arrow';
+    btnArrow2.onclick = () => {
+      let currentPage = localStorage.getItem('currentPage') || 1;
+      if (currentPage < calcMaxPage()) {
+
+        const nextPage = Number(currentPage) + 1;
+        localStorage.setItem('currentPage', `${nextPage}`);
+        renderProductList();
+      }
+    }
 
     const summaryHeader = this.createPageBlock('h2', 'summary__title');
     summaryHeader.textContent = 'Summary';
@@ -56,27 +88,33 @@ class CartPage extends Page {
     qtyProducts.textContent = 'Products:';
 
     const qtyValue = this.createPageBlock('div', 'summary__quantity');
-    const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '[]');
-    qtyValue.textContent = productsInCart.length;
+    const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+    const arrValue = Object.values(productsInCart) as ObjInCart[];
+    const totalQty = arrValue.reduce((acc: number, item: ObjInCart) => acc + item.count, 0);
+    qtyValue.textContent = String(totalQty);
 
     const total = this.createPageBlock('p', 'summary__item');
     total.textContent = 'Total:';
 
     const totalValue = this.createPageBlock('div', 'summary__amount');
-    const totalCost = productsInCart.reduce((acc: number, product: Product) => acc + product.price, 0);
-    const discountedAmount = this.createPageBlock('span', 'summary__discount');
-    discountedAmount.textContent = totalCost;
+    const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
+    totalValue.textContent = `$${totalCost}`;
 
-    total.append(discountedAmount);
+    const discountedAmount = this.createPageBlock('span', 'summary__discount');
 
     const recalculationAmount = () => {
-      if (CartPage.arrDiscount.length === 0) {
+      const arrDiscount: string[] = JSON.parse(localStorage.getItem('arrDiscount') || '[]');
+      const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+      const arrValue = Object.values(productsInCart) as ObjInCart[];
+      const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
+      if (arrDiscount.length === 0) {
         discountedAmount.classList.add('summary__discount_hidden');
-        totalValue.textContent = `$ ${totalCost}`;
+        totalValue.textContent = `$${totalCost}`;
         totalValue.style.textDecoration = 'none';
       } else {
         discountedAmount.classList.remove('summary__discount_hidden');
-        discountedAmount.textContent = `$ ${Math.round(totalCost * (1 - 0.1 * CartPage.arrDiscount.length))}`;
+        discountedAmount.textContent = `$${Math.round(totalCost * (1 - 0.1 * arrDiscount.length))}`;
+        totalValue.textContent = `$${totalCost}`;
         totalValue.style.textDecoration = 'line-through';
       }
     }
@@ -120,9 +158,11 @@ class CartPage extends Page {
     const btnAddDiscount = this.createPageBlock('button', 'promo-block__btn');
     btnAddDiscount.textContent = 'add';
     btnAddDiscount.onclick = () => {
+      const arrDiscount: string[] = JSON.parse(localStorage.getItem('arrDiscount') || '[]');
       appliedBlock.classList.remove('applied-block_hidden');
-      if (!CartPage.arrDiscount.includes(enteringPromoCode.value)) {
-        CartPage.arrDiscount.push(enteringPromoCode.value);
+      if (!arrDiscount.includes(enteringPromoCode.value)) {
+        arrDiscount.push(enteringPromoCode.value);
+        localStorage.setItem('arrDiscount', JSON.stringify(arrDiscount));
       }
       amountDiscount.classList.add('promo-block__item_hidden');
       codeOptions.classList.remove('promo-block__item_hidden');
@@ -131,8 +171,10 @@ class CartPage extends Page {
     };
 
     const renderDiscount = () => {
+      const arrDiscount: string[] = JSON.parse(localStorage.getItem('arrDiscount') || '[]');
+
       codesList.innerHTML = '';
-      CartPage.arrDiscount.forEach((item) => {
+      arrDiscount.forEach((item) => {
         const appliedCode = this.createPageBlock('li', 'applied-block__code');
         appliedCode.textContent = `${item} -10%`;
 
@@ -144,10 +186,15 @@ class CartPage extends Page {
 
         enteringPromoCode.value = '';
 
-        btnDropDiscount.onclick = () => {
-          CartPage.arrDiscount = CartPage.arrDiscount.filter((el) => el !== item);
+        appliedBlock.classList.remove('applied-block_hidden');
 
-          if (CartPage.arrDiscount.length === 0) {
+        btnDropDiscount.onclick = () => {
+          let arrDiscount: string[] = JSON.parse(localStorage.getItem('arrDiscount') || '[]');
+
+          arrDiscount = arrDiscount.filter((el) => el !== item);
+          localStorage.setItem('arrDiscount', JSON.stringify(arrDiscount));
+
+          if (arrDiscount.length === 0) {
             appliedBlock.classList.add('applied-block_hidden');
           }
           renderDiscount();
@@ -155,38 +202,44 @@ class CartPage extends Page {
         }
       })
     }
+    renderDiscount();
 
-    const productsListInCart: any = {};
-    let count = 1;
-
-    const sortedProducts = productsInCart.sort((a: Product, b: Product) => a.id - b.id);
-    sortedProducts.forEach((item: ProductInCart) => {
-      if (item.id in productsListInCart) {
-        count += 1;
-        productsListInCart[item.id] = { count: count, product: item };
-      } else {
-        count = 1;
-        productsListInCart[item.id] = { count: count, product: item };
-      }
-    })
-
-    const idProductList = Object.keys(productsListInCart);
-    
-    console.log(idProductList);
-
+    const calcMaxPage = () => {
+      const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+      const limit = localStorage.getItem('limit') || 3;
+      const idProductsList = Object.keys(productsInCart);
+      const maxPage = Math.ceil(idProductsList.length / Number(limit));
+      return maxPage;
+    }
 
     const renderProductList = () => {
-      if (idProductList.length === 0) {
+      const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+      productsList.innerHTML = '';
+      const limit = localStorage.getItem('limit') || 3;
+      const currentPage = localStorage.getItem('currentPage') || 1;
+      const idProductsList = Object.keys(productsInCart);
+      pages.value = `${currentPage}/${calcMaxPage()}`;
+
+      if (idProductsList.length === 0) {
         productsList.textContent = 'Cart is Empty';
+        productsList.style.textAlign = 'center';
       } else {
-        for (let i = 1; i <= idProductList.length; i++) {
-          const product = productsListInCart[idProductList[i - 1]];
+        offset = (Number(currentPage) - 1) * Number(limit);
+        let end = offset + Number(limit);
+        if (end > idProductsList.length) {
+          end = idProductsList.length
+        }
+
+        for (let i = offset; i < end; i++) {
+          const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+
+          const product = productsInCart[idProductsList[i]];
           const infoProduct = product.product;
 
           const productInCart = this.createPageBlock('div', 'product-list__item');
 
           const index = this.createPageBlock('p', 'product-list__index');
-          index.textContent = `${i}`;
+          index.textContent = `${i + 1}`;
 
           const photoProductInCart = this.createPageBlock('img', 'product-list__photo') as HTMLImageElement;
           photoProductInCart.src = infoProduct.images[0];
@@ -214,16 +267,54 @@ class CartPage extends Page {
           const btnPlus = this.createPageBlock('button', 'product-list__btn');
           btnPlus.textContent = '+';
 
+          const changeSummary = (type: string) => {
+            const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+            
+            if (type === 'add') {
+              productsInCart[infoProduct.id].count += 1;
+            }
+            if (type === 'drop') {
+              if (productsInCart[infoProduct.id].count > 1) {
+                productsInCart[infoProduct.id].count -= 1;
+              } else {
+              delete productsInCart[infoProduct.id];
+              }
+            }
+            localStorage.setItem('products_in_cart', JSON.stringify(productsInCart));
+            const arrValue = Object.values(productsInCart) as ObjInCart[];
+            const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
+            totalValue.textContent = `$${totalCost}`;
+            const totalQty = arrValue.reduce((acc: number, item: ObjInCart) => acc + item.count, 0);
+            qtyValue.textContent = String(totalQty);
+            const cart = document.querySelector('.header__total');
+            const total = document.querySelector('.header__sum-total');
+            (cart as HTMLElement).textContent = String(totalQty);
+            (total as HTMLElement).textContent = String(totalCost);
+          }
+
+          btnPlus.onclick = () => {
+            if (product.count < infoProduct.stock) {
+              changeSummary('add');
+              renderProductList();
+              recalculationAmount();
+            }
+          }
+
           const selectedQty = this.createPageBlock('p', 'product-list__qty');
-          selectedQty.textContent = product.count;
+          selectedQty.textContent = String(product.count);
 
           const btnMinus = this.createPageBlock('button', 'product-list__btn');
           btnMinus.textContent = '-';
+          btnMinus.onclick = () => {
+              changeSummary('drop');
+              renderProductList();
+              recalculationAmount();
+          }
 
           const totalInCart = this.createPageBlock('p', 'product-list__total');
-          totalInCart.textContent = `Total: ${infoProduct.price * product.count}`;
+          totalInCart.textContent = `Total: $${infoProduct.price * product.count}`;
 
-          wrapperQty.append(...[qtyStock, btnPlus, selectedQty, btnMinus, totalInCart]);
+          wrapperQty.append(...[qtyStock, btnMinus, selectedQty, btnPlus, totalInCart]);
           wrapperDesc.append(...[descTitle, descInfo, descRating, descDiscount]);
           productInCart.append(...[index, photoProductInCart, wrapperDesc, wrapperQty]);
           productsList.append(productInCart);
@@ -233,21 +324,14 @@ class CartPage extends Page {
 
     renderProductList();
 
-
-    console.log(sortedProducts);
-    console.log(productsListInCart);
-
-
-
     appliedBlock.append(...[appliedTitle, codesList]);
     amountDiscount.append(btnAddDiscount);
     promoBlock.append(...[enteringPromoCode, codeOptions, amountDiscount]);
-    summarytWrapper.append(...[summaryHeader, qtyProducts, qtyValue, total, totalValue, appliedBlock, promoBlock, btnBuyNow]);
+    summarytWrapper.append(...[summaryHeader, qtyProducts, qtyValue, discountedAmount, total, totalValue, appliedBlock, promoBlock, btnBuyNow]);
     productsHeader.append(...[title, item, itemValue, pagination, btnArrow1, pages, btnArrow2]);
     productsWrapper.append(...[productsHeader, productsList]);
     section.append(...[productsWrapper, summarytWrapper]);
     this.main?.append(section);
-
   }
 
   render() {
