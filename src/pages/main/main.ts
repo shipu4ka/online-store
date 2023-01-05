@@ -188,7 +188,12 @@ class MainPage extends Page {
       cardsProducts.innerHTML = '';
       this.filterCards(products, cardsProducts);
 
+      const showButton = document.querySelector('.cards__show-button') as HTMLButtonElement;
+      showButton.textContent = 'Show More';
+      cardsProducts.style.gridTemplateColumns = 'repeat(3, auto)';
+
       localStorage.removeItem('filter');
+      localStorage.removeItem('cards-view');
 
       const location =  window.location.href;
       const arrIdPage = location.split('#');
@@ -288,10 +293,31 @@ class MainPage extends Page {
 
   createShowMore(sort: HTMLElement) {
     const show = this.createPageBlock('div', 'cards__show');
-    const showText = this.createPageBlock('div', 'cards__show-text');
-    showText.textContent = 'Show more';
-    show.append(...[showText]);
+    const showButton = this.createPageBlock('button', 'cards__show-button') as HTMLButtonElement;
+    showButton.textContent = 'Show More';
+    
+    show.append(...[showButton]);
     sort.append(...[show]);
+
+    function setShowCardsView(cards: HTMLElement) {
+      if (showButton.classList.contains('active')) {
+        showButton.textContent = 'Show Less';
+        cards.style.gridTemplateColumns = 'repeat(5, auto)';
+        localStorage.setItem('cards-view', JSON.stringify('showMore'));
+        //add query-params (use URLSearchParams)
+      } else {
+        showButton.textContent = 'Show More';
+        cards.style.gridTemplateColumns = 'repeat(3, auto)'
+        localStorage.setItem('cards-view', JSON.stringify('showLess'));
+        
+      }
+    }
+
+    showButton.addEventListener('click', () => {
+      showButton.classList.toggle('active');
+      const cardsProducts = document.querySelector('.cards__products') as HTMLElement;
+      setShowCardsView(cardsProducts);
+    })
   }
 
   createCardsSort(cards: HTMLElement) {
@@ -381,6 +407,19 @@ class MainPage extends Page {
     }
     // console.log(location);
     // console.log(arrIdPage);
+
+    
+    const cardsView = localStorage.getItem('cards-view');
+    if (cardsView) {
+      const showButton = document.querySelector('.cards__show-button') as HTMLButtonElement;
+      if (JSON.parse(cardsView) === 'showMore') {
+        cardsProducts.style.gridTemplateColumns = 'repeat(5, auto)';
+        showButton.textContent = 'Show Less';
+      } else {
+        cardsProducts.style.gridTemplateColumns = 'repeat(3, auto)';
+        showButton.textContent = 'Show More';
+      }
+    }
 
     const cardsFilter = localStorage.getItem('filter');
 
