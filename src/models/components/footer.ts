@@ -23,7 +23,7 @@ class Footer extends Component {
 
     const date = document.createElement('time');
     date.className = 'footer__date';
-    date.innerText = '2022';
+    date.innerText = '2023';
 
     const rssLink = document.createElement('a');
     rssLink.className = 'footer__rss-link';

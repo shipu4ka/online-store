@@ -23,12 +23,14 @@ class DescriptionPage extends Page {
 
     const arrow1 = this.createPageBlock('img', 'description__arrow') as HTMLImageElement;
     arrow1.src = '../assets/icons/arrow.svg';
+    arrow1.alt = 'Arrow';
 
     const category = this.createPageBlock('a', 'description__item');
     category.textContent = product.category;
 
     const arrow2 = this.createPageBlock('img', 'description__arrow') as HTMLImageElement;
     arrow2.src = '../assets/icons/arrow.svg';
+    arrow1.alt = 'Arrow';
 
     const productName = this.createPageBlock('span', 'description__item');
     productName.textContent = product.title;
@@ -125,7 +127,6 @@ class DescriptionPage extends Page {
 
   async getProduct() {
     const data = await this.getProductById(this.productId);
-    console.log(data);
     return data;
   }
   
