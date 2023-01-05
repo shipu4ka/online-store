@@ -199,6 +199,15 @@ class MainPage extends Page {
       }
     })
 
+    btn2.addEventListener('click', () => {
+      const link = window.location.href;
+      navigator.clipboard.writeText(link);
+
+      let text = btn2.textContent;
+      btn2.textContent = 'Copied!';
+      setTimeout(() => btn2.textContent = text, 2000);
+    })
+
     return buttons;
   }
 
