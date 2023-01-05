@@ -37,7 +37,6 @@ class CartPage extends Page {
 
     let limit = localStorage.getItem('limit') || 3;
     let offset = 0;
-    let currentPage = localStorage.getItem('currentPage') || 1;
     const itemValue = this.createPageBlock('input', 'products-header__value') as HTMLInputElement;
     itemValue.id = 'item';
     itemValue.value = String(limit);
@@ -74,7 +73,6 @@ class CartPage extends Page {
     btnArrow2.onclick = () => {
       let currentPage = localStorage.getItem('currentPage') || 1;
       if (currentPage < calcMaxPage()) {
-
         const nextPage = Number(currentPage) + 1;
         localStorage.setItem('currentPage', `${nextPage}`);
         renderProductList();
@@ -216,10 +214,14 @@ class CartPage extends Page {
       const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
       productsList.innerHTML = '';
       const limit = localStorage.getItem('limit') || 3;
-      const currentPage = localStorage.getItem('currentPage') || 1;
+      const maxPage = calcMaxPage();
+      let currentPage = localStorage.getItem('currentPage') || 1;
+      if (currentPage > maxPage) {
+        currentPage = maxPage;
+      }
+      pages.value = `${currentPage}/${maxPage}`;
+      
       const idProductsList = Object.keys(productsInCart);
-      pages.value = `${currentPage}/${calcMaxPage()}`;
-
       if (idProductsList.length === 0) {
         productsList.textContent = 'Cart is Empty';
         productsList.style.textAlign = 'center';
@@ -278,6 +280,7 @@ class CartPage extends Page {
                 productsInCart[infoProduct.id].count -= 1;
               } else {
               delete productsInCart[infoProduct.id];
+              renderProductList();
               }
             }
             localStorage.setItem('products_in_cart', JSON.stringify(productsInCart));
