@@ -21,7 +21,7 @@
     margin-bottom: 20px;
   }
 
-  &__item:nth-child(-n+3):hover {
+  &__item:first-child:hover {
     cursor: pointer;
     color: $hoverColor;
     transition: all 0.3s ease 0s

@@ -1,10 +1,11 @@
+import { PageIds } from "../../models/app/app";
 import { Product } from "../../models/interfaces/productsList";
 import Page from "../../models/templates/page";
+import { ObjInCart } from "../cart/cart";
 
 
 class DescriptionPage extends Page {
-  
-  static isCanAdd = true;
+
   private productId: string;
 
   constructor(id: string, productId: string) {
@@ -18,8 +19,9 @@ class DescriptionPage extends Page {
 
     const breadCrumbs = this.createPageBlock('nav', 'description__bread-crumbs', 'container');
 
-    const store = this.createPageBlock('a', 'description__item');
+    const store = this.createPageBlock('a', 'description__item') as HTMLLinkElement;
     store.textContent = 'Store';
+    store.href = `#${PageIds.MainPage}`;
 
     const arrow1 = this.createPageBlock('img', 'description__arrow') as HTMLImageElement;
     arrow1.src = '../assets/icons/arrow.svg';
@@ -49,18 +51,18 @@ class DescriptionPage extends Page {
     mainPhoto.alt = 'Photo product';
 
     const miniPhoto1 = this.createPageBlock('img', 'description__photo', 'description__photo_mini1') as HTMLImageElement;
-    miniPhoto1.src = product.images[1];
+    miniPhoto1.src = product.images[0] || './assets/images/no_photo_images.png';
     miniPhoto1.classList.add('description__photo_active');
     miniPhoto1.onclick = changePhoto;
     miniPhoto1.alt = 'Photo product';
 
     const miniPhoto2 = this.createPageBlock('img', 'description__photo', 'description__photo_mini2') as HTMLImageElement;
-    miniPhoto2.src = product.images[2];
+    miniPhoto2.src = product.images[1] || './assets/images/no_photo_images.png';
     miniPhoto2.onclick = changePhoto;
     miniPhoto2.alt = 'Photo product';
 
     const miniPhoto3 = this.createPageBlock('img', 'description__photo', 'description__photo_mini3') as HTMLImageElement;
-    miniPhoto3.src = product.images[3];
+    miniPhoto3.src = product.images[2] || './assets/images/no_photo_images.png';
     miniPhoto3.onclick = changePhoto;
     miniPhoto3.alt = 'Photo product';
 
@@ -99,7 +101,22 @@ class DescriptionPage extends Page {
 
     const btnAddToCart = this.createPageBlock('button', 'description__add-cart');
     btnAddToCart.textContent = 'add to cart';
-    btnAddToCart.onclick = this.addRemoveToCart;
+    btnAddToCart.onclick = () => {
+      const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+      if (product.id in productsInCart) {
+        productsInCart[product.id].count += 1;
+      } else {
+        productsInCart[product.id] = { count: 1, product: product };
+      }
+      const arrValue = Object.values(productsInCart) as ObjInCart[];
+      const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
+      const totalQty = arrValue.reduce((acc: number, item: ObjInCart) => acc + item.count, 0);
+      localStorage.setItem('products_in_cart', JSON.stringify(productsInCart));
+      const cart = document.querySelector('.header__total');
+      const total = document.querySelector('.header__sum-total');
+      (cart as HTMLElement).textContent = String(totalQty);
+      (total as HTMLElement).textContent = String(totalCost);
+    };
 
     const btnBuyNow = this.createPageBlock('button', 'description__buy-now');
     btnBuyNow.textContent = 'buy now';
@@ -129,25 +146,10 @@ class DescriptionPage extends Page {
     const data = await this.getProductById(this.productId);
     return data;
   }
-  
+
   render() {
     this.getProduct().then(result => this.renderDescriptionPage(result));
     return this.main;
-  }
-
-  addRemoveToCart() {
-    const cart = document.querySelector('.header__total');
-    const productsInCart = Number(cart?.textContent);
-    const btnAddToCart = document.querySelector('.description__add-cart') as HTMLElement;
-    if (DescriptionPage.isCanAdd) {
-      (cart as HTMLElement).textContent = String(productsInCart + 1);
-      btnAddToCart.textContent = 'remove from cart';
-      DescriptionPage.isCanAdd = false;
-    } else {
-      (cart as HTMLElement).textContent = String(productsInCart - 1);
-      btnAddToCart.textContent = 'add to cart';
-      DescriptionPage.isCanAdd = true;
-    }
   }
 
 }
