@@ -49,8 +49,6 @@ class App {
       }
     }
 
-    console.log(hash);
-    console.log(arrIdPage);
 
     if (arrIdPage[0] === '') {
       page = new MainPage(hash);

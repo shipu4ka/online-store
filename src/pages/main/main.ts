@@ -4,6 +4,7 @@ import 'nouislider/dist/nouislider.css';
 import { PageIds } from '../../models/app/app';
 import { Filters, FiltersId } from '../../models/enums/filters';
 import { Product } from '../../models/interfaces/productsList';
+import { ObjInCart } from '../cart/cart';
 
 class MainPage extends Page {
   static TextObject = {
@@ -15,7 +16,7 @@ class MainPage extends Page {
     RatingUp: 'Rating Range Up',
     RatingDown: 'Rating Range Down',
   };
-
+  
   constructor(id: string) {
     super(id);
   }
@@ -373,6 +374,24 @@ class MainPage extends Page {
       const cardButtons = this.createPageBlock('div', 'products__buttons');
       const cardButtonAdd = this.createPageBlock('button', 'products__button','products__add');
       cardButtonAdd.textContent = "Add to Cart";
+
+      cardButtonAdd.onclick = () => {
+        const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+        if (item.id in productsInCart) {
+          productsInCart[item.id].count += 1;
+        } else {
+          productsInCart[item.id] = {count: 1, product: item};
+        }
+        const arrValue = Object.values(productsInCart) as ObjInCart[];
+        const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
+        const totalQty = arrValue.reduce((acc: number, item: ObjInCart) => acc + item.count, 0);
+        localStorage.setItem('products_in_cart', JSON.stringify(productsInCart));
+        const cart = document.querySelector('.header__total');
+        const total = document.querySelector('.header__sum-total');
+        (cart as HTMLElement).textContent = String(totalQty);
+        (total as HTMLElement).textContent = String(totalCost);
+      }
+
       const cardButtonDetails = this.createPageBlock('button', 'products__button', 'products__details');
       cardButtonDetails.textContent = 'Details';
       cardButtonDetails.onclick = function () {
