@@ -4,6 +4,7 @@
   grid-template-columns: auto 300px;
   column-gap: 20px;
   padding: 0px 10px;
+  min-height: 990px;
 }
 
 .title {
@@ -260,6 +261,9 @@
     transition: all 0.3s ease 0s;
     &:hover{
       @extend %greyBorder;
+    }
+    &.hidden {
+      display: none;
     }
   }
   &__title {

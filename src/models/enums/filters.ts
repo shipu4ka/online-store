@@ -17,3 +17,8 @@ export enum FiltersId {
   RatingUp,
   RatingDown,
 }
+
+export enum FiltersTitle {
+  NotFound = 'No products found',
+  Sorted = 'Sorted categories',
+}
