@@ -103,6 +103,10 @@ class DescriptionPage extends Page {
 
     const btnBuyNow = this.createPageBlock('button', 'description__buy-now');
     btnBuyNow.textContent = 'buy now';
+    btnBuyNow.onclick = () => {
+      const modal = document.querySelector('.modal') as HTMLElement;
+      modal.style.display = 'block';
+    }
 
     breadCrumbs.append(...[store, arrow1, category, arrow2, productName]);
     cardImages.append(...[mainPhoto, miniPhoto1, miniPhoto2, miniPhoto3]);

@@ -1,12 +1,12 @@
 import Page from '../templates/page';
 import MainPage from '../../pages/main/main';
 import DescriptionPage from '../../pages/description/description';
-import ConfirmPage from '../../pages/confirm/confirm';
 import CartPage from '../../pages/cart/cart';
 import Header from '../components/header';
 import ErrorPage, { ErrorTypes } from '../../pages/404/404';
 import Footer from '../components/footer';
 import { Filters } from '../enums/filters';
+import { listener } from '../../pages/confirm/confirm';
 
 export const enum PageIds {
   MainPage = 'main-page',
@@ -58,8 +58,6 @@ class App {
       getFilterHash(arrIdPage);
     } else if (arrIdPage[0] === PageIds.DescriptionPage) {
       page = new DescriptionPage(arrIdPage[0], arrIdPage[1]);
-    } else if (hash === PageIds.ConfirmPage) {
-      page = new ConfirmPage(hash);
     } else if (hash === PageIds.CartPage) {
       page = new CartPage(hash);
     } else {
@@ -90,6 +88,7 @@ class App {
       this.header.render();
       this.footer.render();
       this.enableRouteChange();
+      listener();
     }
   }
 }

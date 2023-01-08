@@ -1,3 +1,4 @@
+import { LocalStorageKey } from "../../models/enums/products";
 import { Product, ProductInCart } from "../../models/interfaces/productsList";
 import Page from "../../models/templates/page";
 
@@ -35,7 +36,7 @@ class CartPage extends Page {
     item.textContent = 'limit:';
     item.htmlFor = 'item';
 
-    let limit = localStorage.getItem('limit') || 3;
+    let limit = localStorage.getItem(LocalStorageKey.limit) || 3;
     let offset = 0;
     const itemValue = this.createPageBlock('input', 'products-header__value') as HTMLInputElement;
     itemValue.id = 'item';
@@ -43,7 +44,7 @@ class CartPage extends Page {
     itemValue.type = 'number';
     itemValue.oninput = (e) => {
       const target = e.target as HTMLInputElement;
-      localStorage.setItem('limit', target.value);
+      localStorage.setItem(LocalStorageKey.limit, target.value);
       renderProductList();
     }
 
@@ -55,10 +56,10 @@ class CartPage extends Page {
     btnArrow1.src = '../assets/icons/arrow_reverse.svg';
     btnArrow1.alt = 'Arrow';
     btnArrow1.onclick = () => {
-      let currentPage = localStorage.getItem('currentPage') || 1;
+      let currentPage = localStorage.getItem(LocalStorageKey.currentPage) || 1;
       if (currentPage > 1) {
         const nextPage = Number(currentPage) - 1;
-        localStorage.setItem('currentPage', `${nextPage}`);
+        localStorage.setItem(LocalStorageKey.currentPage, `${nextPage}`);
         renderProductList();
       }
     }
@@ -71,10 +72,10 @@ class CartPage extends Page {
     btnArrow2.src = '../assets/icons/arrow.svg';
     btnArrow2.alt = 'Arrow';
     btnArrow2.onclick = () => {
-      let currentPage = localStorage.getItem('currentPage') || 1;
+      let currentPage = localStorage.getItem(LocalStorageKey.currentPage) || 1;
       if (currentPage < calcMaxPage()) {
         const nextPage = Number(currentPage) + 1;
-        localStorage.setItem('currentPage', `${nextPage}`);
+        localStorage.setItem(LocalStorageKey.currentPage, `${nextPage}`);
         renderProductList();
       }
     }
@@ -86,7 +87,7 @@ class CartPage extends Page {
     qtyProducts.textContent = 'Products:';
 
     const qtyValue = this.createPageBlock('div', 'summary__quantity');
-    const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+    const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
     const arrValue = Object.values(productsInCart) as ObjInCart[];
     const totalQty = arrValue.reduce((acc: number, item: ObjInCart) => acc + item.count, 0);
     qtyValue.textContent = String(totalQty);
@@ -101,8 +102,8 @@ class CartPage extends Page {
     const discountedAmount = this.createPageBlock('span', 'summary__discount');
 
     const recalculationAmount = () => {
-      const arrDiscount: string[] = JSON.parse(localStorage.getItem('arrDiscount') || '[]');
-      const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+      const arrDiscount: string[] = JSON.parse(localStorage.getItem(LocalStorageKey.arrDiscount) || '[]');
+      const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
       const arrValue = Object.values(productsInCart) as ObjInCart[];
       const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
       if (arrDiscount.length === 0) {
@@ -122,6 +123,10 @@ class CartPage extends Page {
 
     const btnBuyNow = this.createPageBlock('button', 'summary__buy');
     btnBuyNow.textContent = 'Buy now';
+    btnBuyNow.onclick = () => {
+      const modal = document.querySelector('.modal') as HTMLElement;
+      modal.style.display = 'block';
+    }
 
     const enteringPromoCode = this.createPageBlock('input', 'promo-block__code') as HTMLInputElement;
     enteringPromoCode.placeholder = 'Enter promo code';
@@ -156,11 +161,11 @@ class CartPage extends Page {
     const btnAddDiscount = this.createPageBlock('button', 'promo-block__btn');
     btnAddDiscount.textContent = 'add';
     btnAddDiscount.onclick = () => {
-      const arrDiscount: string[] = JSON.parse(localStorage.getItem('arrDiscount') || '[]');
+      const arrDiscount: string[] = JSON.parse(localStorage.getItem(LocalStorageKey.arrDiscount) || '[]');
       appliedBlock.classList.remove('applied-block_hidden');
       if (!arrDiscount.includes(enteringPromoCode.value)) {
         arrDiscount.push(enteringPromoCode.value);
-        localStorage.setItem('arrDiscount', JSON.stringify(arrDiscount));
+        localStorage.setItem(LocalStorageKey.arrDiscount, JSON.stringify(arrDiscount));
       }
       amountDiscount.classList.add('promo-block__item_hidden');
       codeOptions.classList.remove('promo-block__item_hidden');
@@ -169,7 +174,7 @@ class CartPage extends Page {
     };
 
     const renderDiscount = () => {
-      const arrDiscount: string[] = JSON.parse(localStorage.getItem('arrDiscount') || '[]');
+      const arrDiscount: string[] = JSON.parse(localStorage.getItem(LocalStorageKey.arrDiscount) || '[]');
 
       codesList.innerHTML = '';
       arrDiscount.forEach((item) => {
@@ -187,10 +192,10 @@ class CartPage extends Page {
         appliedBlock.classList.remove('applied-block_hidden');
 
         btnDropDiscount.onclick = () => {
-          let arrDiscount: string[] = JSON.parse(localStorage.getItem('arrDiscount') || '[]');
+          let arrDiscount: string[] = JSON.parse(localStorage.getItem(LocalStorageKey.arrDiscount) || '[]');
 
           arrDiscount = arrDiscount.filter((el) => el !== item);
-          localStorage.setItem('arrDiscount', JSON.stringify(arrDiscount));
+          localStorage.setItem(LocalStorageKey.arrDiscount, JSON.stringify(arrDiscount));
 
           if (arrDiscount.length === 0) {
             appliedBlock.classList.add('applied-block_hidden');
@@ -203,19 +208,19 @@ class CartPage extends Page {
     renderDiscount();
 
     const calcMaxPage = () => {
-      const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
-      const limit = localStorage.getItem('limit') || 3;
+      const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
+      const limit = localStorage.getItem(LocalStorageKey.limit) || 3;
       const idProductsList = Object.keys(productsInCart);
       const maxPage = Math.ceil(idProductsList.length / Number(limit));
       return maxPage;
     }
 
     const renderProductList = () => {
-      const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+      const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
       productsList.innerHTML = '';
-      const limit = localStorage.getItem('limit') || 3;
+      const limit = localStorage.getItem(LocalStorageKey.limit) || 3;
       const maxPage = calcMaxPage();
-      let currentPage = localStorage.getItem('currentPage') || 1;
+      let currentPage = localStorage.getItem(LocalStorageKey.currentPage) || 1;
       if (currentPage > maxPage) {
         currentPage = maxPage;
       }
@@ -233,7 +238,7 @@ class CartPage extends Page {
         }
 
         for (let i = offset; i < end; i++) {
-          const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+          const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
 
           const product = productsInCart[idProductsList[i]];
           const infoProduct = product.product;
@@ -270,7 +275,7 @@ class CartPage extends Page {
           btnPlus.textContent = '+';
 
           const changeSummary = (type: string) => {
-            const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+            const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
             
             if (type === 'add') {
               productsInCart[infoProduct.id].count += 1;
@@ -283,7 +288,7 @@ class CartPage extends Page {
               renderProductList();
               }
             }
-            localStorage.setItem('products_in_cart', JSON.stringify(productsInCart));
+            localStorage.setItem(LocalStorageKey.productsInCart, JSON.stringify(productsInCart));
             const arrValue = Object.values(productsInCart) as ObjInCart[];
             const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
             totalValue.textContent = `$${totalCost}`;
