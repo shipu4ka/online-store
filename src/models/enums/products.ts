@@ -4,4 +4,11 @@ enum ProductsUrlAPI {
   Product = 'https://dummyjson.com/products',
 }
 
+export enum LocalStorageKey {
+  productsInCart = 'productsInCart',
+  limit = 'limit',
+  arrDiscount = 'arrDiscount',
+  currentPage = 'currentPage',
+}
+
 export default ProductsUrlAPI;

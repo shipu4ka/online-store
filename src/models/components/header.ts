@@ -2,6 +2,7 @@ import Component from '../templates/components';
 import { PageIds } from '../app/app';
 import { Product } from '../interfaces/productsList';
 import { ObjInCart } from '../../pages/cart/cart';
+import { LocalStorageKey } from '../enums/products';
 
 const Navigation = [
   {
@@ -31,7 +32,7 @@ class Header extends Component {
   }
 
   renderPageNav() {
-    const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+    const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
     const arrValue = Object.values(productsInCart) as ObjInCart[];
 
     const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
