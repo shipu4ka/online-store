@@ -11,13 +11,14 @@ export function listener() {
   const cvv = document.getElementById('cvv') as HTMLInputElement;
   const payment = document.querySelector('.credit-details__payment') as HTMLElement;
 
-  // нужно написать валидацию для всех полей
-
   const btn = document.querySelector('.confirm__btn') as HTMLElement;
   const modal = document.querySelector('.modal') as HTMLElement;
   const form = document.querySelector('.confirm__form') as HTMLElement;
 
   btn.onclick = () => {
+    if (document.querySelector('.confirm__check_error')) {
+      return;
+    }
     const tmp = form.innerHTML;
     form.innerHTML = 'Your order has been processed and shipped. Expect delivery.';
     form.style.textAlign = 'center';
@@ -41,8 +42,10 @@ export function listener() {
 
   card.oninput = (e) => {
     const target = e.target as HTMLInputElement;
-    const firstNumber = target.value.slice(0, 1);
-    
+    const value = target.value;
+    const firstNumber = value.slice(0, 1);
+    const regExp = /^[0-9]{16}$/;
+
     if (firstNumber === '4') {
       payment.style.backgroundImage = 'url(./assets/images/visa_logo.png)';
     } else if (firstNumber === '5') {
@@ -52,5 +55,102 @@ export function listener() {
     } else {
       payment.style.backgroundImage = 'url(./assets/images/mir_logo.jpg)';
     }
+
+    if (!regExp.test(value)) {
+      card.parentElement?.classList.add('confirm__check_error');
+    } else {
+      card.parentElement?.classList.remove('confirm__check_error');
+    }
   }
+
+  name.oninput = (e) => {
+    const target = e.target as HTMLInputElement;
+    const value = target.value;
+    let isValid = true;
+    if (value.split(' ').length < 2) {
+      isValid = false;
+    }
+    value.split(' ').forEach((el) => {
+      if (el.length < 3) {
+        isValid = false;
+      }
+    })
+    if (!isValid) {
+      name.parentElement?.classList.add('confirm__check_error');
+    } else {
+      name.parentElement?.classList.remove('confirm__check_error');
+    }
+  }
+
+  phone.oninput = (e) => {
+    const target = e.target as HTMLInputElement;
+    const value = target.value;
+    let isValid = true;
+    const regExp = /^((\+)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{9,20}$/;
+    if (!regExp.test(value)) {
+      isValid = false;
+    }
+    if (!isValid) {
+      phone.parentElement?.classList.add('confirm__check_error');
+    } else {
+      phone.parentElement?.classList.remove('confirm__check_error');
+    }
+  }
+
+  email.oninput = (e) => {
+    const target = e.target as HTMLInputElement;
+    const value = target.value;
+    let isValid = true;
+    const regExp = /^[-a-z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-a-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?\.)*/;
+    if (!regExp.test(value)) {
+      isValid = false;
+    }
+    if (!isValid) {
+      email.parentElement?.classList.add('confirm__check_error');
+    } else {
+      email.parentElement?.classList.remove('confirm__check_error');
+    }
+  }
+
+  delivery.oninput = (e) => {
+    const target = e.target as HTMLInputElement;
+    const value = target.value;
+    let isValid = true;
+    if (value.split(' ').length < 3) {
+      isValid = false;
+    }
+    value.split(' ').forEach((el) => {
+      if (el.length < 5) {
+        isValid = false;
+      }
+    })
+    if (!isValid) {
+      delivery.parentElement?.classList.add('confirm__check_error');
+    } else {
+      delivery.parentElement?.classList.remove('confirm__check_error');
+    }
+  }
+
+  cvv.oninput = (e) => {
+    const target = e.target as HTMLInputElement;
+    const value = target.value;
+    const regExp = /^[0-9]{3}$/;
+    if (!regExp.test(value)) {
+      cvv.parentElement?.classList.add('confirm__check_error');
+    } else {
+      cvv.parentElement?.classList.remove('confirm__check_error');
+    }
+  }
+
+  data.oninput = (e) => {
+    const target = e.target as HTMLInputElement;
+    const value = target.value;
+    const regExp = /^(0[1-9]|1[0-2])\/?([0-9]{2})$/;
+    if (!regExp.test(value)) {
+      data.parentElement?.classList.add('confirm__check_error');
+    } else {
+      data.parentElement?.classList.remove('confirm__check_error');
+    }
+  }
+
 }
