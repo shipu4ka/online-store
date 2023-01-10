@@ -43,7 +43,6 @@ class Header extends Component {
     pageNav.classList.add('container');
 
     const logo = this.createNavElement(0);
-    const confirm = this.createNavElement(1);
     const cart = this.createNavElement(2);
 
     const sumBlock = this.createComponentBlock('div', 'header__sum');
@@ -58,7 +57,7 @@ class Header extends Component {
     
     total.textContent = String(totalQty);
 
-    pageNav.append(...[logo, sumBlock, confirm, cart, total]);
+    pageNav.append(...[logo, sumBlock, cart, total]);
 
     this.element.append(pageNav);
   }
