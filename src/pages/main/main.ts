@@ -273,8 +273,6 @@ class MainPage extends Page {
         }
       };
 
-      console.log(allIds);
-
       return allIds;
     }
 
@@ -282,11 +280,10 @@ class MainPage extends Page {
       const allSliderIds = getSliderDataIds();
       let allIds: Array<Product["id"]> = [...allSliderIds];
 
-      // console.log('all: ', allIds);
-
       showCards(allIds);
       setFoundInfo(allIds);
       setCategoriesToShow ();
+      setBrandsToShow();
     }
 
     sliderPrice.addEventListener('change', setCards);
@@ -330,6 +327,30 @@ class MainPage extends Page {
     const allCategories = document.querySelector('.filters__categories') as HTMLElement;
     const checkboxCategoryList = document.querySelectorAll('.filters__checkbox-category') as NodeListOf<HTMLInputElement>;
     
+    function styleCheckboxes(checkboxList: NodeListOf<HTMLInputElement>, arrCheckboxes: Array<Product["category"]> | Array<Product["brand"]>) {
+      checkboxList.forEach((item) => {
+        const inputLabel = item.parentElement;
+        const total = inputLabel?.nextElementSibling as HTMLElement;
+
+        if (inputLabel) {
+          if (!arrCheckboxes.includes(item.value)) {
+            inputLabel.style.opacity = '0.5';
+            inputLabel.dataset.active = 'false';
+            if (total) {
+              total.style.opacity = '0.5';
+            }
+
+          } else {
+            inputLabel.style.opacity = '1';
+            inputLabel.dataset.active = 'true';
+
+            if (total) {
+              total.style.opacity = '1';
+            }
+          }
+        }
+      });
+    }
     
     function getCategoriesData() {
       const allCheckedCategories: Array<Product["category"]> = [];
@@ -357,12 +378,10 @@ class MainPage extends Page {
     function setCategoriesToShow () {
       const allSliderIds = getSliderDataIds();
       const categories: Array<Product["category"]> = [];
-      // const categoriesIds: Array<Product["id"]> = [];
 
       dataProducts.forEach((item) => {
         if(allSliderIds.includes(item.id)) {
           categories.push(item.category);
-          // categoriesIds.push(item.id);
         }
       })
 
@@ -378,30 +397,7 @@ class MainPage extends Page {
         }
       }
 
-      // console.log(categories);
-      // console.log(categoriesObj);
-
-      checkboxCategoryList.forEach((item) => {
-        const inputLabel = item.parentElement;
-        const totalCategories = inputLabel?.nextElementSibling as HTMLElement;
-
-        if (inputLabel) {
-          if (!categories.includes(item.value)) {
-            inputLabel.style.opacity = '0.5';
-            inputLabel.dataset.active = 'false';
-            if (totalCategories) {
-              totalCategories.style.opacity = '0.5';
-            }
-
-          } else {
-            inputLabel.style.opacity = '1';
-
-            if (totalCategories) {
-              totalCategories.style.opacity = '1';
-            }
-          }
-        }
-      });
+      styleCheckboxes(checkboxCategoryList, categories);
 
       for (let i = 0; i < objCategoryProducts.length; i += 1) {
         totalCategories[i].textContent = `${categoriesObj[i].count} / ${objCategoryProducts[i].count}`;
@@ -409,17 +405,44 @@ class MainPage extends Page {
 
     }
 
-    function setCardsForCategories () {
-      const checkedCategoriesId: Array<Product["id"]> = getCategoriesData();
+    function setCardsForCheckboxes() {
       const sliderDataIds = getSliderDataIds();
 
-      if (checkedCategoriesId.length === 0) {
+      const checkedBrandsId: Array<Product["id"]> = getBrandsData();
+      const checkedCategoriesId: Array<Product["id"]> = getCategoriesData();
+      const checkedIds: Array<Product["id"]> = [];
+
+      const [long, short] = checkedBrandsId.length > checkedCategoriesId.length ? [checkedBrandsId, checkedCategoriesId] : [checkedCategoriesId, checkedBrandsId];
+      short.sort((a, b) => a - b);
+      const shortLength = short.length;
+      
+      const binSearch = (needle: Product["id"]) => {
+        let start = 0, finish = shortLength - 1;
+        while (start <= finish) {
+          const center = Math.floor((start + finish) / 2);
+          if (short[center] < needle) start = center + 1;
+          else if (short[center] > needle) finish = center - 1;
+          else return true;
+        }
+        return false;
+      }
+
+      for (let i = 0; i < long.length; i += 1)
+        if (binSearch(long[i])) checkedIds.push(long[i]);
+
+      if (checkedBrandsId.length === 0 && checkedCategoriesId.length === 0) {
         showCards(sliderDataIds);
         setFoundInfo(sliderDataIds);
-      } else {
+      } else if (checkedBrandsId.length === 0) {
         showCards(checkedCategoriesId);
         setFoundInfo(checkedCategoriesId);
-      }
+      } else if (checkedCategoriesId.length === 0) {
+        showCards(checkedBrandsId);
+        setFoundInfo(checkedBrandsId);
+      } else if (checkedIds) {
+        showCards(checkedIds);
+        setFoundInfo(checkedIds);
+      } 
     }
 
     allCategories.addEventListener('click', (e) => {
@@ -448,7 +471,9 @@ class MainPage extends Page {
             } else if (label.dataset.active === 'true') {
 
               if (sliderDataIds.length === dataProducts.length) {
-                setCardsForCategories();
+                setCardsForCheckboxes();
+              } else {
+                showCheckedCheckboxesWithSliders();
               }
             }
           }
@@ -486,11 +511,181 @@ class MainPage extends Page {
     filterContainerBrand.append(...[brandTitle, brand]);
     filters.append(...[filterContainerBrand]);
 
-    const totalBrand = document.querySelectorAll('.filters__total-brand');
+    const totalBrands = document.querySelectorAll('.filters__total-brand');
 
     for (let i = 0; i < objDataProducts.length; i += 1) {
-      totalBrand[i].textContent = `${objDataProducts[i].count} / ${objDataProducts[i].count}`;
+      totalBrands[i].textContent = `${objDataProducts[i].count} / ${objDataProducts[i].count}`;
     }
+
+    const allBrands = document.querySelector('.filters__brands') as HTMLElement;
+    const checkboxBrandsList = document.querySelectorAll('.filters__checkbox-brand') as NodeListOf<HTMLInputElement>;
+
+    function getBrandsData() {
+      const allCheckedBrands: Array<Product["brand"]> = [];
+      const checkedBrandsId: Array<Product["id"]> = [];
+
+      checkboxBrandsList.forEach((item) => {
+        const inputLabel = item.parentElement;
+        if (inputLabel) {
+          if (inputLabel.dataset.active === 'true' && item.checked) {
+            allCheckedBrands.push(item.value);
+          }
+        } 
+      });
+
+      dataProducts.filter((item) => {
+        const itemCategory = item.brand.toLocaleLowerCase();
+        if(allCheckedBrands.includes(itemCategory)) {
+          checkedBrandsId.push(item.id);
+        } 
+      });
+      console.log(checkedBrandsId);
+
+      return checkedBrandsId;
+    }
+
+    function setBrandsToShow () {
+      const allSliderIds = getSliderDataIds();
+      const brands: Array<Product["brand"]> = [];
+
+      dataProducts.forEach((item) => {
+        if(allSliderIds.includes(item.id)) {
+          const brandToPush = (item.brand).toLocaleLowerCase();
+          brands.push(brandToPush);
+        }
+      })
+
+      const brandsObj = uniqArrDataProducts.map((name) => {
+        return {count: 0, name: name}
+      });
+
+      for (let i = 0; i < brands.length; i += 1) {
+        for (let j = 0; j < brandsObj.length; j += 1) {
+          if (brands[i] === brandsObj[j].name) {
+            brandsObj[j].count += 1;
+          }
+        }
+      }
+
+      styleCheckboxes(checkboxBrandsList, brands);
+
+      for (let i = 0; i < objDataProducts.length; i += 1) {
+        totalBrands[i].textContent = `${brandsObj[i].count} / ${objDataProducts[i].count}`;
+      }
+
+    }
+
+    allBrands.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const sliderDataIds = getSliderDataIds();
+
+      if (target) {
+
+        if (target.closest('.filters__label')) {
+          const label = target.closest('.filters__label') as HTMLElement;
+          const checkbox = target.closest('.filters__checkbox-brand') as HTMLInputElement;
+          
+          if (label) {
+            
+            if (label.dataset.active === 'false') {
+
+              if (checkbox.checked) {
+                cardsTitle.textContent = FiltersTitle.NotFound;
+                cards.forEach((item) => {
+                  item.classList.add('hidden');
+                })
+              } else {
+                setCards();
+              }
+
+            } else if (label.dataset.active === 'true') {
+
+              if (sliderDataIds.length === dataProducts.length) {
+                console.log(getBrandsData());
+                setCardsForCheckboxes();
+              } else {
+                // showCheckedBrandsWithSliders();
+                showCheckedCheckboxesWithSliders();
+              }
+            }
+          }
+        }
+      }
+
+    })
+
+    function showCheckedCheckboxesWithSliders() {
+      const activeCardsId = getSliderDataIds();
+      // const activeBrandCheckboxes: string[] = setActiveCheckboxes(checkboxBrandsList);
+      // const activeCategoryCheckboxes: string[] = setActiveCheckboxes(checkboxCategoryList);
+      const checkedBrandCheckboxes:string[] = setCheckedCheckboxes(checkboxBrandsList); 
+      const checkedCategoryCheckboxes:string[] = setCheckedCheckboxes(checkboxCategoryList);
+
+      //for localStorage
+        function setActiveCheckboxes(list: NodeListOf<HTMLInputElement>) {
+          const result: string[] = [];
+
+          list.forEach((item) => { //найти active чекбоксы
+            const label = item.parentElement;
+            if (label) {
+              if (label.dataset.active === 'true') {
+                result.push(item.value)
+              }
+            }
+          })
+
+          return result;
+        }
+
+        function setCheckedCheckboxes(list: NodeListOf<HTMLInputElement>) {
+          const result: string[] = [];
+
+          list.forEach((item) => { //найти active чекбоксы
+            const label = item.parentElement;
+            if (item.checked ) {
+              if (label) {
+                if (label.dataset.active === 'true') {
+                  result.push(item.value);
+                }
+              }
+            }
+          })
+
+          return result;
+        }
+
+        cards.forEach((item) => { //найти активные карточки
+
+          const id = Number(item.dataset.id);
+          const brand = item.dataset.brand;
+          const category = item.dataset.category;
+
+          if (activeCardsId.includes(id)) {
+            item.classList.remove('hidden');
+          }
+
+          checkedBrandCheckboxes.forEach((elem) => {
+            if (elem !== brand) {
+              item.classList.add('hidden');
+            }
+          })
+
+          checkedCategoryCheckboxes.forEach((elem) => {
+            if (elem !== category) {
+              item.classList.add('hidden');
+            }
+          })
+
+          if (brand && category) {
+            if (activeCardsId.includes(id) 
+              && (checkedBrandCheckboxes.includes(brand) || checkedCategoryCheckboxes.includes(category))) {
+              item.classList.remove('hidden');
+              console.log(item); //add items id to local storage
+            }
+          }
+
+        })
+      }
   }
 
   async createFiltersButtons(buttons: HTMLElement) {
@@ -660,6 +855,10 @@ class MainPage extends Page {
     return product.forEach((item) => {
       const card = this.createPageBlock('div', 'cards__card', 'products__card');
       card.dataset.id = `${item.id}`;
+      let brand = (item.brand).toLowerCase();
+      let category = (item.category).toLowerCase();
+      card.dataset.brand = brand;
+      card.dataset.category = category;
       const cardTitle = this.createPageBlock('h3', 'products__title');
       cardTitle.textContent = item.title;
       const cardItems = this.createPageBlock('div', 'products__items');
