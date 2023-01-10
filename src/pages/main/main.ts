@@ -17,7 +17,7 @@ class MainPage extends Page {
     RatingUp: 'Rating Range Up',
     RatingDown: 'Rating Range Down',
   };
-  
+
   constructor(id: string) {
     super(id);
   }
@@ -47,7 +47,7 @@ class MainPage extends Page {
     return ul;
   }
 
-  createTitle(content:string) {
+  createTitle(content: string) {
     const title = this.createPageBlock('h2', 'filters__title', 'title');
     title.textContent = content;
     return title;
@@ -56,8 +56,8 @@ class MainPage extends Page {
   createMultiRangeSlider(filters: HTMLElement, containerMod: string, titleNode: string, min: string, max: string, minId: string, maxId: string, sliderMod: string) {
     const filterContainer = this.createPageBlock('div', 'filters__container', containerMod);
     const title = this.createTitle(titleNode);
-    const slider = this.createPageBlock('div', 'filters__slider','slider');
-    const sliderBody  = this.createPageBlock('div', 'slider__body', sliderMod) as noUiSlider.target;
+    const slider = this.createPageBlock('div', 'filters__slider', 'slider');
+    const sliderBody = this.createPageBlock('div', 'slider__body', sliderMod) as noUiSlider.target;
     const inputs = this.createPageBlock('div', 'slider__inputs');
     const label1 = this.createPageBlock('label', 'slider__label');
     const span1 = this.createPageBlock('span', 'slider__text');
@@ -85,33 +85,33 @@ class MainPage extends Page {
       connect: true,
       step: 1,
       range: {
-          'min': [Number(min)],
-          'max': [Number(max)]
-      }
-  });
-
-  if ( sliderBody.noUiSlider) {
-    sliderBody.noUiSlider.on('update', (values, handle: number) => {
-      if (handle === 0) {
-        input1.value = (Math.round(Number(values[handle]))).toString();
-      }
-      if (handle === 1) {
-        input2.value = (Math.round(Number(values[handle]))).toString();
+        'min': [Number(min)],
+        'max': [Number(max)]
       }
     });
-  }
 
-  [input1, input2].forEach((input, handle) => {
-    input.addEventListener('change', (e) => {
-      let target = <HTMLInputElement>e.currentTarget;
-      let targetValue = target.value;
-      if (target) {
-        if ( sliderBody.noUiSlider) {
-          sliderBody.noUiSlider.setHandle(handle, targetValue);
+    if (sliderBody.noUiSlider) {
+      sliderBody.noUiSlider.on('update', (values, handle: number) => {
+        if (handle === 0) {
+          input1.value = (Math.round(Number(values[handle]))).toString();
         }
-      }
-    });
-  })
+        if (handle === 1) {
+          input2.value = (Math.round(Number(values[handle]))).toString();
+        }
+      });
+    }
+
+    [input1, input2].forEach((input, handle) => {
+      input.addEventListener('change', (e) => {
+        let target = <HTMLInputElement>e.currentTarget;
+        let targetValue = target.value;
+        if (target) {
+          if (sliderBody.noUiSlider) {
+            sliderBody.noUiSlider.setHandle(handle, targetValue);
+          }
+        }
+      });
+    })
 
     label1.append(...[span1, input1]);
     label2.append(...[span2, input2]);
@@ -148,12 +148,12 @@ class MainPage extends Page {
     this.createMultiRangeSlider(filters, 'filters__container-price', 'Price', minPrice, maxPrice, 'min-price', 'max-price', 'slider__body-price');
     this.createMultiRangeSlider(filters, 'filters__container-stock', 'Stock', minStock, maxStock, 'min-stock', 'max-stock', 'slider__body-stock');
 
-    const sliderPrice  = document.querySelector('.filters__container-price') as HTMLElement;
-    const sliderStock  = document.querySelector('.filters__container-stock') as HTMLElement;
-    const sliderBodyPrice  = document.querySelector('.slider__body-price') as noUiSlider.target;
-    const sliderBodyStock  = document.querySelector('.slider__body-stock') as noUiSlider.target;
-    const cards = document.querySelectorAll('.products__card') as NodeListOf<HTMLElement>;    
-    const cardsTitle = document.querySelector('.cards__title ') as HTMLElement;    
+    const sliderPrice = document.querySelector('.filters__container-price') as HTMLElement;
+    const sliderStock = document.querySelector('.filters__container-stock') as HTMLElement;
+    const sliderBodyPrice = document.querySelector('.slider__body-price') as noUiSlider.target;
+    const sliderBodyStock = document.querySelector('.slider__body-stock') as noUiSlider.target;
+    const cards = document.querySelectorAll('.products__card') as NodeListOf<HTMLElement>;
+    const cardsTitle = document.querySelector('.cards__title ') as HTMLElement;
 
     const found = document.querySelector('.cards__found-info') as HTMLElement;
 
@@ -170,7 +170,7 @@ class MainPage extends Page {
           item.classList.remove('hidden');
           let id = Number(item.dataset.id);
           if (!matchArray.includes(id)) {
-            item.classList.add('hidden'); 
+            item.classList.add('hidden');
           }
         });
       }
@@ -191,7 +191,7 @@ class MainPage extends Page {
     }
 
     function getSliderDataPrice() {
-      if (sliderBodyPrice.noUiSlider ) {
+      if (sliderBodyPrice.noUiSlider) {
         const sliderValue = sliderBodyPrice.noUiSlider.get();
         const minVal = +sliderValue[0 as unknown as keyof typeof sliderValue];
         const maxVal = +sliderValue[1 as unknown as keyof typeof sliderValue];
@@ -199,7 +199,7 @@ class MainPage extends Page {
         const idArrPrice: Array<Product["id"]> = [];
         const arrStockValues: Array<Product["stock"]> = [];
 
-        if(sliderBodyPrice) {
+        if (sliderBodyPrice) {
           dataProducts.forEach((item) => {
             const itemPrice = item.price;
             if (itemPrice >= minVal && itemPrice <= maxVal) {
@@ -208,7 +208,7 @@ class MainPage extends Page {
             }
           });
         }
-        
+
         arrStockValues.sort((a, b) => a - b);
         // console.log('price: ', idArrPrice);
         // console.log('stock values sort: ', arrStockValues);
@@ -221,15 +221,15 @@ class MainPage extends Page {
     }
 
     function getSliderDataStock() {
-      if (sliderBodyStock.noUiSlider ) {
+      if (sliderBodyStock.noUiSlider) {
         const sliderValue = sliderBodyStock.noUiSlider.get();
         const minVal = +sliderValue[0 as unknown as keyof typeof sliderValue];
         const maxVal = +sliderValue[1 as unknown as keyof typeof sliderValue];
 
         const idArrStock: Array<Product["id"]> = [];
         const arrPriceValues: Array<Product["price"]> = [];
-        
-        if(sliderBodyStock) {
+
+        if (sliderBodyStock) {
           dataProducts.forEach((item) => {
             const itemStock = item.stock;
             if (itemStock >= minVal && itemStock <= maxVal) {
@@ -240,7 +240,7 @@ class MainPage extends Page {
         }
         // console.log('stock: ', idArrStock);
         // console.log('price values: ', arrPriceValues);
-        
+
         return idArrStock;
       }
     }
@@ -252,15 +252,15 @@ class MainPage extends Page {
 
       let allIds: Array<Product["id"]> = [];
 
-      if (arrPrice && arrStock ) {
-        if (arrPrice.length === productsAmount 
-          && arrStock.length === productsAmount ) {
+      if (arrPrice && arrStock) {
+        if (arrPrice.length === productsAmount
+          && arrStock.length === productsAmount) {
 
           allIds.push(...arrPrice);
 
-        } else if (arrPrice.length !== productsAmount 
+        } else if (arrPrice.length !== productsAmount
           && arrStock.length !== productsAmount) {
-          
+
           arrStock.forEach(item => {
             if (arrPrice.includes(item)) {
               allIds.push(item);
@@ -283,7 +283,7 @@ class MainPage extends Page {
 
       showCards(allIds);
       setFoundInfo(allIds);
-      setCategoriesToShow ();
+      setCategoriesToShow();
       setBrandsToShow();
     }
 
@@ -291,7 +291,7 @@ class MainPage extends Page {
     sliderStock.addEventListener('change', setCards);
     sliderPrice.addEventListener('click', setCards);
     sliderStock.addEventListener('click', setCards);
-    
+
     //categories=============================================================
 
     const filterContainerCategories = this.createPageBlock('div', 'filters__container');
@@ -308,7 +308,7 @@ class MainPage extends Page {
     })
 
     const objCategoryProducts = CategoriesData.map((name) => {
-      return {count: 0, name: name}
+      return { count: 0, name: name }
     });
 
     for (let i = 0; i < arrCategoryProducts.length; i += 1) {
@@ -331,7 +331,7 @@ class MainPage extends Page {
 
     const allCategories = document.querySelector('.filters__categories') as HTMLElement;
     const checkboxCategoryList = document.querySelectorAll('.filters__checkbox-category') as NodeListOf<HTMLInputElement>;
-    
+
     function styleCheckboxes(checkboxList: NodeListOf<HTMLInputElement>, arrCheckboxes: Array<Product["category"]> | Array<Product["brand"]>) {
       checkboxList.forEach((item) => {
         const inputLabel = item.parentElement;
@@ -356,7 +356,7 @@ class MainPage extends Page {
         }
       });
     }
-    
+
     function getCategoriesData() {
       const allCheckedCategories: Array<Product["category"]> = [];
       const checkedCategoriesId: Array<Product["id"]> = [];
@@ -367,31 +367,31 @@ class MainPage extends Page {
           if (inputLabel.dataset.active === 'true' && item.checked) {
             allCheckedCategories.push(item.value);
           }
-        } 
+        }
       });
 
       dataProducts.filter((item) => {
         const itemCategory = item.category.toLocaleLowerCase();
-        if(allCheckedCategories.includes(itemCategory)) {
+        if (allCheckedCategories.includes(itemCategory)) {
           checkedCategoriesId.push(item.id);
-        } 
+        }
       });
 
       return checkedCategoriesId;
     }
 
-    function setCategoriesToShow () {
+    function setCategoriesToShow() {
       const allSliderIds = getSliderDataIds();
       const categories: Array<Product["category"]> = [];
 
       dataProducts.forEach((item) => {
-        if(allSliderIds.includes(item.id)) {
+        if (allSliderIds.includes(item.id)) {
           categories.push(item.category);
         }
       })
 
       const categoriesObj = CategoriesData.map((name) => {
-        return {count: 0, name: name}
+        return { count: 0, name: name }
       });
 
       for (let i = 0; i < categories.length; i += 1) {
@@ -420,7 +420,7 @@ class MainPage extends Page {
       const [long, short] = checkedBrandsId.length > checkedCategoriesId.length ? [checkedBrandsId, checkedCategoriesId] : [checkedCategoriesId, checkedBrandsId];
       short.sort((a, b) => a - b);
       const shortLength = short.length;
-      
+
       const binSearch = (needle: Product["id"]) => {
         let start = 0, finish = shortLength - 1;
         while (start <= finish) {
@@ -447,7 +447,7 @@ class MainPage extends Page {
       } else if (checkedIds) {
         showCards(checkedIds);
         setFoundInfo(checkedIds);
-      } 
+      }
     }
 
     allCategories.addEventListener('click', (e) => {
@@ -459,9 +459,9 @@ class MainPage extends Page {
         if (target.closest('.filters__label')) {
           const label = target.closest('.filters__label') as HTMLElement;
           const checkbox = target.closest('.filters__checkbox-category') as HTMLInputElement;
-          
+
           if (label) {
-            
+
             if (label.dataset.active === 'false') {
 
               if (checkbox.checked) {
@@ -502,7 +502,7 @@ class MainPage extends Page {
 
 
     const objDataProducts = uniqArrDataProducts.map((name) => {
-      return {count: 0, name: name}
+      return { count: 0, name: name }
     });
 
     for (let i = 0; i < arrDataProducts.length; i += 1) {
@@ -538,33 +538,33 @@ class MainPage extends Page {
           if (inputLabel.dataset.active === 'true' && item.checked) {
             allCheckedBrands.push(item.value);
           }
-        } 
+        }
       });
 
       dataProducts.filter((item) => {
         const itemCategory = item.brand.toLocaleLowerCase();
-        if(allCheckedBrands.includes(itemCategory)) {
+        if (allCheckedBrands.includes(itemCategory)) {
           checkedBrandsId.push(item.id);
-        } 
+        }
       });
       console.log(checkedBrandsId);
 
       return checkedBrandsId;
     }
 
-    function setBrandsToShow () {
+    function setBrandsToShow() {
       const allSliderIds = getSliderDataIds();
       const brands: Array<Product["brand"]> = [];
 
       dataProducts.forEach((item) => {
-        if(allSliderIds.includes(item.id)) {
+        if (allSliderIds.includes(item.id)) {
           const brandToPush = (item.brand).toLocaleLowerCase();
           brands.push(brandToPush);
         }
       })
 
       const brandsObj = uniqArrDataProducts.map((name) => {
-        return {count: 0, name: name}
+        return { count: 0, name: name }
       });
 
       for (let i = 0; i < brands.length; i += 1) {
@@ -592,9 +592,9 @@ class MainPage extends Page {
         if (target.closest('.filters__label')) {
           const label = target.closest('.filters__label') as HTMLElement;
           const checkbox = target.closest('.filters__checkbox-brand') as HTMLInputElement;
-          
+
           if (label) {
-            
+
             if (label.dataset.active === 'false') {
 
               if (checkbox.checked) {
@@ -626,106 +626,106 @@ class MainPage extends Page {
       const activeCardsId = getSliderDataIds();
       // const activeBrandCheckboxes: string[] = setActiveCheckboxes(checkboxBrandsList);
       // const activeCategoryCheckboxes: string[] = setActiveCheckboxes(checkboxCategoryList);
-      const checkedBrandCheckboxes:string[] = setCheckedCheckboxes(checkboxBrandsList); 
-      const checkedCategoryCheckboxes:string[] = setCheckedCheckboxes(checkboxCategoryList);
+      const checkedBrandCheckboxes: string[] = setCheckedCheckboxes(checkboxBrandsList);
+      const checkedCategoryCheckboxes: string[] = setCheckedCheckboxes(checkboxCategoryList);
 
       //for localStorage
-        function setActiveCheckboxes(list: NodeListOf<HTMLInputElement>) {
-          const result: string[] = [];
+      function setActiveCheckboxes(list: NodeListOf<HTMLInputElement>) {
+        const result: string[] = [];
 
-          list.forEach((item) => { //найти active чекбоксы
-            const label = item.parentElement;
+        list.forEach((item) => { //найти active чекбоксы
+          const label = item.parentElement;
+          if (label) {
+            if (label.dataset.active === 'true') {
+              result.push(item.value)
+            }
+          }
+        })
+
+        return result;
+      }
+
+      function setCheckedCheckboxes(list: NodeListOf<HTMLInputElement>) {
+        const result: string[] = [];
+
+        list.forEach((item) => { //найти active чекбоксы
+          const label = item.parentElement;
+          if (item.checked) {
             if (label) {
               if (label.dataset.active === 'true') {
-                result.push(item.value)
+                result.push(item.value);
               }
             }
-          })
+          }
+        })
 
-          return result;
+        return result;
+      }
+
+      cards.forEach((item) => { //найти активные карточки
+
+        const id = Number(item.dataset.id);
+        const brand = item.dataset.brand;
+        const category = item.dataset.category;
+
+        if (activeCardsId.includes(id)) {
+          item.classList.remove('hidden');
         }
 
-        function setCheckedCheckboxes(list: NodeListOf<HTMLInputElement>) {
-          const result: string[] = [];
+        checkedBrandCheckboxes.forEach((elem) => {
+          if (elem !== brand) {
+            item.classList.add('hidden');
+          }
+        })
 
-          list.forEach((item) => { //найти active чекбоксы
-            const label = item.parentElement;
-            if (item.checked ) {
-              if (label) {
-                if (label.dataset.active === 'true') {
-                  result.push(item.value);
-                }
-              }
-            }
-          })
+        checkedCategoryCheckboxes.forEach((elem) => {
+          if (elem !== category) {
+            item.classList.add('hidden');
+          }
+        })
 
-          return result;
-        }
-
-        cards.forEach((item) => { //найти активные карточки
-
-          const id = Number(item.dataset.id);
-          const brand = item.dataset.brand;
-          const category = item.dataset.category;
-
-          if (activeCardsId.includes(id)) {
+        if (brand && category) {
+          if (activeCardsId.includes(id)
+            && (checkedBrandCheckboxes.includes(brand) || checkedCategoryCheckboxes.includes(category))) {
             item.classList.remove('hidden');
+            console.log(item); //add items id to local storage
           }
+        }
 
-          checkedBrandCheckboxes.forEach((elem) => {
-            if (elem !== brand) {
-              item.classList.add('hidden');
-            }
-          })
+      })
+    }
 
-          checkedCategoryCheckboxes.forEach((elem) => {
-            if (elem !== category) {
-              item.classList.add('hidden');
-            }
-          })
+    function resetFilters() {
+      const resetButton = document.querySelector('.filters__button-reset');
+      const labelsList = document.querySelectorAll('.filters__label') as NodeListOf<HTMLElement>;
+      const sort = document.querySelector('.sort');
 
-          if (brand && category) {
-            if (activeCardsId.includes(id) 
-              && (checkedBrandCheckboxes.includes(brand) || checkedCategoryCheckboxes.includes(category))) {
-              item.classList.remove('hidden');
-              console.log(item); //add items id to local storage
-            }
-          }
-
+      function resetCategoriesStyles() {
+        labelsList.forEach((item) => {
+          item.dataset.active = 'true';
+          item.style.opacity = '1';
+          const total = item.nextElementSibling as HTMLElement;
+          total.style.opacity = '1';
         })
       }
 
-      function resetFilters() {
-        const resetButton = document.querySelector('.filters__button-reset');
-        const labelsList = document.querySelectorAll('.filters__label') as NodeListOf<HTMLElement>;
-        const sort = document.querySelector('.sort');
+      if (resetButton) {
+        resetButton.addEventListener('click', () => {
+          if (sort) {
+            found.textContent = '100';
+          }
 
-        function resetCategoriesStyles() {
-          labelsList.forEach((item) => {
-            item.dataset.active = 'true';
-            item.style.opacity = '1';
-            const total = item.nextElementSibling as HTMLElement;
-            total.style.opacity = '1';
-          })
-        }
-
-        if (resetButton) {
-          resetButton.addEventListener('click', () => {
-            if (sort) {
-              found.textContent = '100';
-            }
-            
-            fillTotalCategories();
-            fillTotalBrand();
-            for (let i = 0; i < objDataProducts.length; i += 1) {
-              totalBrands[i].textContent = `${objDataProducts[i].count} / ${objDataProducts[i].count}`;
-            }
-            resetCategoriesStyles();
-          })
-        }
+          fillTotalCategories();
+          fillTotalBrand();
+          for (let i = 0; i < objDataProducts.length; i += 1) {
+            totalBrands[i].textContent = `${objDataProducts[i].count} / ${objDataProducts[i].count}`;
+          }
+          resetCategoriesStyles();
+        })
       }
+    }
 
-      resetFilters();
+    resetFilters();
   }
 
   async createFiltersButtons(buttons: HTMLElement) {
@@ -756,7 +756,7 @@ class MainPage extends Page {
       showButton.textContent = 'Show More';
       cardsProducts.style.gridTemplateColumns = 'repeat(3, auto)';
 
-      const sliderPrice = document.querySelector('.slider__body-price') as noUiSlider.target; 
+      const sliderPrice = document.querySelector('.slider__body-price') as noUiSlider.target;
       const sliderStock = document.querySelector('.slider__body-stock') as noUiSlider.target;
 
       if (sliderPrice.noUiSlider && sliderStock.noUiSlider) {
@@ -776,7 +776,7 @@ class MainPage extends Page {
       localStorage.removeItem('filter');
       localStorage.removeItem('cards-view');
 
-      const location =  window.location.href;
+      const location = window.location.href;
       const arrIdPage = location.split('#');
       const lastItem = arrIdPage[arrIdPage.length - 1];
 
@@ -842,12 +842,12 @@ class MainPage extends Page {
     sort.append(...[select]);
 
     const cardsFilter = localStorage.getItem('filter');
-      if (cardsFilter) {
-        const cardsFilterParse = JSON.parse(cardsFilter);
-        selectTag.selectedIndex = Number(cardsFilterParse[0]);
-      } else {
-        selectTag.selectedIndex = 0;
-      }
+    if (cardsFilter) {
+      const cardsFilterParse = JSON.parse(cardsFilter);
+      selectTag.selectedIndex = Number(cardsFilterParse[0]);
+    } else {
+      selectTag.selectedIndex = 0;
+    }
   }
 
   createFound(sort: HTMLElement) {
@@ -873,7 +873,7 @@ class MainPage extends Page {
     const show = this.createPageBlock('div', 'cards__show');
     const showButton = this.createPageBlock('button', 'cards__show-button') as HTMLButtonElement;
     showButton.textContent = 'Show More';
-    
+
     show.append(...[showButton]);
     sort.append(...[show]);
 
@@ -887,7 +887,7 @@ class MainPage extends Page {
         showButton.textContent = 'Show More';
         cards.style.gridTemplateColumns = 'repeat(3, auto)'
         localStorage.setItem('cards-view', JSON.stringify('showLess'));
-        
+
       }
     }
 
@@ -944,7 +944,7 @@ class MainPage extends Page {
 
       const cardRatingValue = this.createPageBlock('div', 'rating__value');
       cardRatingValue.textContent = `${item.rating}`;
-    
+
       function setRating(index: string = cardRatingValue.innerHTML) {
         const ratingActiveWidth = Number(index) / 0.05;
         cardRatingActive.style.width = `${ratingActiveWidth}%`;
@@ -952,16 +952,23 @@ class MainPage extends Page {
 
       setRating();
 
+      const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
       const cardButtons = this.createPageBlock('div', 'products__buttons');
-      const cardButtonAdd = this.createPageBlock('button', 'products__button','products__add');
-      cardButtonAdd.textContent = "Add to Cart";
+      const cardButtonAdd = this.createPageBlock('button', 'products__button', 'products__add');
+      if (item.id in productsInCart) {
+        cardButtonAdd.textContent = 'remove';
+      } else {
+        cardButtonAdd.textContent = 'add to cart';
+      }
 
       cardButtonAdd.onclick = () => {
         const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
         if (item.id in productsInCart) {
-          productsInCart[item.id].count += 1;
+          delete productsInCart[item.id];
+          cardButtonAdd.textContent = 'add to cart';
         } else {
-          productsInCart[item.id] = {count: 1, product: item};
+          productsInCart[item.id] = { count: 1, product: item };
+          cardButtonAdd.textContent = 'remove';
         }
         const arrValue = Object.values(productsInCart) as ObjInCart[];
         const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
@@ -999,14 +1006,14 @@ class MainPage extends Page {
     const data = await this.getPageData();
     let products = data.products;
 
-    const hash =  window.location.hash.slice(1);
+    const hash = window.location.hash.slice(1);
     const arrIdPage = hash.split('/');
     const lastItem = arrIdPage[arrIdPage.length - 1];
-    if(lastItem) {
+    if (lastItem) {
       sortCards(lastItem);
     }
 
-    
+
     const cardsView = localStorage.getItem('cards-view');
     if (cardsView) {
       const showButton = document.querySelector('.cards__show-button') as HTMLButtonElement;
@@ -1059,7 +1066,7 @@ class MainPage extends Page {
     }
 
     function sortCards(value: string) {
-      switch(value) {
+      switch (value) {
         case Filters.Default:
           cardsProducts.innerHTML = '';
           title.textContent = MainPage.TextObject.Default;
@@ -1112,14 +1119,14 @@ class MainPage extends Page {
         const target = e.target as HTMLOptionElement;
         const targetValue = target.value;
 
-        const location =  window.location.href;
+        const location = window.location.href;
         const hash = window.location.hash.slice(1);
         const arrIdPage = hash.split('/');
         const lastItem = arrIdPage[arrIdPage.length - 1];
 
         let regexp: RegExp;
 
-        switch(lastItem) {
+        switch (lastItem) {
           case '':
             window.location.href = `${location}#main-page/${targetValue}`;
             break
