@@ -693,13 +693,13 @@ class MainPage extends Page {
     const data = await this.getPageData();
     let products = data.products;
 
-    const btn1 = this.createPageBlock('button', 'filters__button');
-    btn1.textContent = 'Reset Filters';
-    const btn2 = this.createPageBlock('button', 'filters__button');
-    btn2.textContent = 'Copy Link';
-    buttons.append(...[btn1, btn2]);
+    const reset = this.createPageBlock('button', 'filters__button');
+    reset.textContent = 'Reset Filters';
+    const copy = this.createPageBlock('button', 'filters__button');
+    copy.textContent = 'Copy Link';
+    buttons.append(...[reset, copy]);
 
-    btn1.addEventListener('click', () => {
+    reset.addEventListener('click', () => {
       const cards = document.querySelector('.cards') as HTMLElement;
       cards.dataset.filter = Filters.Default;
 
@@ -717,6 +717,14 @@ class MainPage extends Page {
       showButton.textContent = 'Show More';
       cardsProducts.style.gridTemplateColumns = 'repeat(3, auto)';
 
+      const sliderPrice = document.querySelector('.slider__body-price') as noUiSlider.target; 
+      const sliderStock = document.querySelector('.slider__body-stock') as noUiSlider.target;
+
+      if (sliderPrice.noUiSlider && sliderStock.noUiSlider) {
+        sliderPrice.noUiSlider.reset();
+        sliderStock.noUiSlider.reset();
+      }
+
       localStorage.removeItem('filter');
       localStorage.removeItem('cards-view');
 
@@ -729,13 +737,13 @@ class MainPage extends Page {
       }
     })
 
-    btn2.addEventListener('click', () => {
+    copy.addEventListener('click', () => {
       const link = window.location.href;
       navigator.clipboard.writeText(link);
 
-      let text = btn2.textContent;
-      btn2.textContent = 'Copied!';
-      setTimeout(() => btn2.textContent = text, 2000);
+      let text = copy.textContent;
+      copy.textContent = 'Copied!';
+      setTimeout(() => copy.textContent = text, 2000);
     })
 
     return buttons;
@@ -873,7 +881,6 @@ class MainPage extends Page {
       cardPrice.textContent = `Price: $ ${item.price}`;
       const cardDiscount = this.createPageBlock('div', 'products__discount');
       cardDiscount.textContent = `Discount: ${item.discountPercentage}%`;
-
       const cardRating = this.createPageBlock('div', 'products__rating', 'rating');
       const cardRatingBody = this.createPageBlock('div', 'rating__body');
       const cardRatingActive = this.createPageBlock('div', 'rating__active');
