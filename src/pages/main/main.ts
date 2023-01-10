@@ -321,9 +321,13 @@ class MainPage extends Page {
 
     const totalCategories = document.querySelectorAll('.filters__total-category');
 
-    for (let i = 0; i < objCategoryProducts.length; i += 1) {
-      totalCategories[i].textContent = `${objCategoryProducts[i].count} / ${objCategoryProducts[i].count}`;
+    function fillTotalCategories() {
+      for (let i = 0; i < objCategoryProducts.length; i += 1) {
+        totalCategories[i].textContent = `${objCategoryProducts[i].count} / ${objCategoryProducts[i].count}`;
+      }
     }
+
+    fillTotalCategories();
 
     const allCategories = document.querySelector('.filters__categories') as HTMLElement;
     const checkboxCategoryList = document.querySelectorAll('.filters__checkbox-category') as NodeListOf<HTMLInputElement>;
@@ -514,9 +518,12 @@ class MainPage extends Page {
 
     const totalBrands = document.querySelectorAll('.filters__total-brand');
 
-    for (let i = 0; i < objDataProducts.length; i += 1) {
-      totalBrands[i].textContent = `${objDataProducts[i].count} / ${objDataProducts[i].count}`;
+    function fillTotalBrand() {
+      for (let i = 0; i < objDataProducts.length; i += 1) {
+        totalBrands[i].textContent = `${objDataProducts[i].count} / ${objDataProducts[i].count}`;
+      }
     }
+    fillTotalBrand();
 
     const allBrands = document.querySelector('.filters__brands') as HTMLElement;
     const checkboxBrandsList = document.querySelectorAll('.filters__checkbox-brand') as NodeListOf<HTMLInputElement>;
@@ -687,15 +694,47 @@ class MainPage extends Page {
 
         })
       }
+
+      function resetFilters() {
+        const resetButton = document.querySelector('.filters__button-reset');
+        const labelsList = document.querySelectorAll('.filters__label') as NodeListOf<HTMLElement>;
+        const sort = document.querySelector('.sort');
+
+        function resetCategoriesStyles() {
+          labelsList.forEach((item) => {
+            item.dataset.active = 'true';
+            item.style.opacity = '1';
+            const total = item.nextElementSibling as HTMLElement;
+            total.style.opacity = '1';
+          })
+        }
+
+        if (resetButton) {
+          resetButton.addEventListener('click', () => {
+            if (sort) {
+              found.textContent = '100';
+            }
+            
+            fillTotalCategories();
+            fillTotalBrand();
+            for (let i = 0; i < objDataProducts.length; i += 1) {
+              totalBrands[i].textContent = `${objDataProducts[i].count} / ${objDataProducts[i].count}`;
+            }
+            resetCategoriesStyles();
+          })
+        }
+      }
+
+      resetFilters();
   }
 
   async createFiltersButtons(buttons: HTMLElement) {
     const data = await this.getPageData();
     let products = data.products;
 
-    const reset = this.createPageBlock('button', 'filters__button');
+    const reset = this.createPageBlock('button', 'filters__button', 'filters__button-reset');
     reset.textContent = 'Reset Filters';
-    const copy = this.createPageBlock('button', 'filters__button');
+    const copy = this.createPageBlock('button', 'filters__button', 'filters__button-copy');
     copy.textContent = 'Copy Link';
     buttons.append(...[reset, copy]);
 
@@ -724,6 +763,15 @@ class MainPage extends Page {
         sliderPrice.noUiSlider.reset();
         sliderStock.noUiSlider.reset();
       }
+
+      function resetCategoryFilters() {
+        const checkboxCategoryList = document.querySelectorAll('.filters__checkbox-category') as NodeListOf<HTMLInputElement>;
+        checkboxCategoryList.forEach((item) => {
+          item.checked = false;
+        })
+      }
+
+      resetCategoryFilters();
 
       localStorage.removeItem('filter');
       localStorage.removeItem('cards-view');
@@ -957,8 +1005,6 @@ class MainPage extends Page {
     if(lastItem) {
       sortCards(lastItem);
     }
-    // console.log(location);
-    // console.log(arrIdPage);
 
     
     const cardsView = localStorage.getItem('cards-view');
