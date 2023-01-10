@@ -1,0 +1,165 @@
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 2;
+}
+
+.confirm {
+    width: 40vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    position: fixed;
+    top: calc(50% - 50%/2);
+    left: calc(50% - 40vw/2);
+    z-index: 3;
+    background-color: $bgc2;
+    @extend %greyBorder;
+    padding: 20px;
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    &__title {
+        font-size: 1.3vw;
+        padding: 0 5px;
+    }
+
+    &__item {
+        @extend %greyBorder;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    &__label {
+        font-size: 1vw;
+        margin-right: 10px;
+    }
+
+    &__btn {
+        @extend %button;
+        width: 20vw;
+        font-size: 1.3vw;
+    }
+
+    &__details {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    &__check {
+        font-size: 1vw;
+        color: #ff0000;
+        display: none;
+    }
+
+    &__check_error .confirm__check {
+        display: block;
+    }
+}
+
+.personal-details {
+    &__input {
+        padding-left: 10px;
+        flex-grow: 2;
+        margin-right: 10px;
+    }
+
+    &__item {
+        display: flex;
+        align-items: flex-end;
+    }
+}
+
+.credit-details {
+    &__item {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+    }
+
+    &__input {
+        padding-left: 10px;
+        flex-grow: 2;
+        margin-right: 10px;
+    }
+
+    &__payment {
+        width: 30px;
+        height: 15px;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+}
+
+.card-valid {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    &__input {
+        width: 40px;
+        margin-right: 10px;
+        padding-left: 5px;
+    }
+}
+
+@media(max-width: 800px) {
+    .confirm {
+        padding: 10px;
+        width: 60vw;
+        left: calc(50% - 60vw/2);
+
+        &__label {
+            font-size: 1.2vw;
+        }
+
+        &__check {
+            font-size: 1.2vw;
+        }
+
+        &__title {
+            font-size: 1.5vw;
+        }
+
+        &__btn {
+            font-size: 1.6vw;
+        }
+    }
+}
+
+@media(max-width: 450px) {
+    .confirm {
+        padding: 5px;
+        width: 90vw;
+        left: calc(50% - 90vw/2);
+
+        &__label {
+            font-size: 2vw;
+        }
+
+        &__check {
+            font-size: 2vw;
+        }
+
+        &__title {
+            font-size: 2vw;
+        }
+
+        &__btn {
+            font-size: 3vw;
+        }
+    }
+}

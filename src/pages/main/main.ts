@@ -5,6 +5,7 @@ import { PageIds } from '../../models/app/app';
 import { Filters, FiltersId, FiltersTitle } from '../../models/enums/filters';
 import { Product } from '../../models/interfaces/productsList';
 import { ObjInCart } from '../cart/cart';
+import { LocalStorageKey } from '../../models/enums/products';
 
 class MainPage extends Page {
   static TextObject = {
@@ -901,7 +902,7 @@ class MainPage extends Page {
       cardButtonAdd.textContent = "Add to Cart";
 
       cardButtonAdd.onclick = () => {
-        const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+        const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
         if (item.id in productsInCart) {
           productsInCart[item.id].count += 1;
         } else {
@@ -910,7 +911,7 @@ class MainPage extends Page {
         const arrValue = Object.values(productsInCart) as ObjInCart[];
         const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
         const totalQty = arrValue.reduce((acc: number, item: ObjInCart) => acc + item.count, 0);
-        localStorage.setItem('products_in_cart', JSON.stringify(productsInCart));
+        localStorage.setItem(LocalStorageKey.productsInCart, JSON.stringify(productsInCart));
         const cart = document.querySelector('.header__total');
         const total = document.querySelector('.header__sum-total');
         (cart as HTMLElement).textContent = String(totalQty);
