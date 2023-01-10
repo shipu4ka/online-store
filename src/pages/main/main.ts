@@ -1188,4 +1188,6 @@ class MainPage extends Page {
   }
 }
 
+console.log('Score:270/300\nmain page with filters 90/120\n(query parameters for filters -10\nquery parameters for sort - 5\nsearch - 15)\nShopping Cart Page 60/60\nConfirm modal window 50 / 50\nProduct description page 40/40\nHeader 20/20\n404 10/10');
+
 export default MainPage;
