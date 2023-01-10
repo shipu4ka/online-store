@@ -1,4 +1,5 @@
 import { PageIds } from "../../models/app/app";
+import { LocalStorageKey } from "../../models/enums/products";
 import { Product } from "../../models/interfaces/productsList";
 import Page from "../../models/templates/page";
 import { ObjInCart } from "../cart/cart";
@@ -99,19 +100,26 @@ class DescriptionPage extends Page {
     const price = this.createPageBlock('div', 'description__price');
     price.textContent = `$ ${product.price}`;
 
+    const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
     const btnAddToCart = this.createPageBlock('button', 'description__add-cart');
-    btnAddToCart.textContent = 'add to cart';
+    if (product.id in productsInCart) {
+      btnAddToCart.textContent = 'remove from cart';
+    } else {
+      btnAddToCart.textContent = 'add to cart';
+    }
     btnAddToCart.onclick = () => {
-      const productsInCart = JSON.parse(localStorage.getItem('products_in_cart') || '{}');
+      const productsInCart = JSON.parse(localStorage.getItem(LocalStorageKey.productsInCart) || '{}');
       if (product.id in productsInCart) {
-        productsInCart[product.id].count += 1;
+        delete productsInCart[product.id];
+        btnAddToCart.textContent = 'add to cart';
       } else {
         productsInCart[product.id] = { count: 1, product: product };
+        btnAddToCart.textContent = 'remove from cart';
       }
       const arrValue = Object.values(productsInCart) as ObjInCart[];
       const totalCost = arrValue.reduce((acc: number, item: ObjInCart) => acc + (item.count * item.product.price), 0);
       const totalQty = arrValue.reduce((acc: number, item: ObjInCart) => acc + item.count, 0);
-      localStorage.setItem('products_in_cart', JSON.stringify(productsInCart));
+      localStorage.setItem(LocalStorageKey.productsInCart, JSON.stringify(productsInCart));
       const cart = document.querySelector('.header__total');
       const total = document.querySelector('.header__sum-total');
       (cart as HTMLElement).textContent = String(totalQty);
