@@ -1,0 +1,29 @@
+<svg width="40" height="39" viewBox="0 0 40 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_12_60)">
+<rect width="40" height="39" fill="white"/>
+<rect x="0.5" y="0.5" width="39" height="38" rx="4.5" fill="white"/>
+<rect x="0.5" y="0.5" width="39" height="38" rx="4.5" stroke="#FF0088"/>
+<rect x="0.5" y="0.5" width="39" height="38" rx="4.5" stroke="#FF0088" stroke-opacity="0.2"/>
+<circle cx="6.5" cy="7.5" r="2.5" fill="#FF0088"/>
+<circle cx="24.5" cy="7.5" r="2.5" fill="#FF0088"/>
+<circle cx="15.5" cy="7.5" r="2.5" fill="#FF0088"/>
+<circle cx="33.5" cy="7.5" r="2.5" fill="#FF0088"/>
+<circle cx="6.5" cy="15.5" r="2.5" fill="#FF0088"/>
+<circle cx="24.5" cy="15.5" r="2.5" fill="#FF0088"/>
+<circle cx="15.5" cy="15.5" r="2.5" fill="#FF0088"/>
+<circle cx="33.5" cy="15.5" r="2.5" fill="#FF0088"/>
+<circle cx="6.5" cy="23.5" r="2.5" fill="#FF0088"/>
+<circle cx="24.5" cy="23.5" r="2.5" fill="#FF0088"/>
+<circle cx="15.5" cy="23.5" r="2.5" fill="#FF0088"/>
+<circle cx="33.5" cy="23.5" r="2.5" fill="#FF0088"/>
+<circle cx="6.5" cy="31.5" r="2.5" fill="#FF0088"/>
+<circle cx="24.5" cy="31.5" r="2.5" fill="#FF0088"/>
+<circle cx="15.5" cy="31.5" r="2.5" fill="#FF0088"/>
+<circle cx="33.5" cy="31.5" r="2.5" fill="#FF0088"/>
+</g>
+<defs>
+<clipPath id="clip0_12_60">
+<rect width="40" height="39" fill="white"/>
+</clipPath>
+</defs>
+</svg>

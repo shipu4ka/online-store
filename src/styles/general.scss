@@ -1,0 +1,146 @@
+@import url(https://fonts.googleapis.com/css?family=Montserrat:100,200,300,regular,500,600,700,800,900,300italic,500italic,600italic,700italic,800italic,900italic);
+
+//максимальная и минимальная ширина экрана
+$minWidth: 320px;
+$maxWidthContainer: 1600px;
+
+//натроики шрифта
+$fontFamily: Montserrat;
+$fontSize: 16;
+
+//медиа берек-поинты, при каких размерах экрана будет перестраиваться преложение
+$md1: $maxWidthContainer + 12px;
+$md2: 992.98px;
+$md3: 767.98px;
+$md4: 479.98px;
+
+//цвета
+$mainColor: #222222; //цвет шрифта
+$bgc: #ffffff;
+$bgc2: #EBE9EA;
+$hoverColor: #ff0088;
+$greyColor1: #444444;
+$greyColor2: #665760;
+
+%greyBorder {
+  border: 1px solid $greyColor2;
+  border-radius: 10px;
+}
+
+%lightGreyBorder {
+  border: 1px solid $bgc2;
+  border-radius: 10px;
+}
+
+%pinkBorder {
+  border: 1px solid $hoverColor;
+  border-radius: 10px;
+}
+
+%buttonsWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+%button {
+  color: $greyColor2;
+  background-color: $bgc;
+  border: 1px solid $greyColor2;
+  border-radius: 10px;
+  font-size: 16px;
+  padding: 10px 10px;
+  transition: all 0.3s ease 0s;
+  min-width: 110px;
+  &:hover {
+    color: $bgc;
+    background-color: $greyColor2;
+    border: 1px solid $greyColor2;
+  }
+  &:active {
+    border: 1px solid $greyColor2;
+  }
+}
+
+@import 'reset.scss';
+
+//для плавного скролла
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: $mainColor;
+  background: $bgc;
+  font-family: $fontFamily;
+  @media (max-width: $md3) {
+    &.lock {
+      //специальный класс, который будет блокировать скролл, если открыты попапы или меню-бургеры
+      overflow: hidden;
+    }
+  }
+}
+
+.content {
+  flex: 1 1 auto;
+}
+
+//врапер, который отцентрует приложение по середине
+.root {
+  min-height: 100%;
+  width: 100%;
+  overflow: hidden;
+  margin: 0 auto;
+  font-size: 16px;
+  //для футора, чтобы он всегда был снизу
+  display: flex;
+  flex-direction: column;
+}
+
+//для выравнивания контента внутри root
+.container {
+  max-width: $maxWidthContainer;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 0px;
+  @media (max-width: $md1) {
+    max-width: 970px;
+  }
+  @media (max-width: $md2) {
+    max-width: 750px;
+  }
+  @media (max-width: $md3) {
+    max-width: none;
+    padding: 0 10px;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background-color: $bgc2;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  height: 50px;
+  border: 3px solid $bgc2;
+  border-radius: 5px;
+  background-color: $greyColor2;
+}
+
+@supports (scrollbar-color: $hoverColor $greyColor2) {
+  * {
+      scrollbar-color: $hoverColor $greyColor2;
+      scrollbar-width: thin;
+  }
+}
+
+@import 'header.scss';
+@import 'footer.scss';
+@import '../pages/main/main.scss';
+@import '../pages/description/description.scss';
+@import '../pages/confirm/confirm.scss';
+@import '../pages/cart/cart.scss';
+@import '../pages/404/404.scss';

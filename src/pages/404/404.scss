@@ -1,0 +1,25 @@
+.error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+  height: 80vh;
+
+  &__title {
+    font-size: 6em;
+    color: $hoverColor;
+    font-weight: 500;
+    padding: 0px 0px 40px 0px;
+  }
+
+  &__subtitle {
+    font-size: 2em;
+    font-weight: 500;
+    padding: 0px 0px 40px 0px;
+  }
+
+  &__text {
+    min-width: 600px;
+  }
+}
