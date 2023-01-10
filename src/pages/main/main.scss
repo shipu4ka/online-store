@@ -4,6 +4,7 @@
   grid-template-columns: auto 300px;
   column-gap: 20px;
   padding: 0px 10px;
+  min-height: 990px;
 }
 
 .title {
@@ -159,14 +160,21 @@
     }
   }
   &__show {
-    &-text {
+    &-button {
       background: url('../assets/icons/show_more.svg') 0 0 /25px 25px no-repeat;
       padding:  5px 0px 5px 35px;
       height: 100%;
+      font-size: 16px;
       transition: all 0.3s ease 0s;
       &:hover{
         color: $hoverColor;
-        background: url('../assets/icons/show_more-p.svg') 0 0 /25px 25px no-repeat;
+        background: url('../assets/icons/show_more-h.svg') 0 0 /25px 25px no-repeat;
+      }
+      &.active {
+        background: url('../assets/icons/show_more-2.svg') 0 0 /25px 25px no-repeat;
+        &:hover{
+          background: url('../assets/icons/show_more-2-h.svg') 0 0 /25px 25px no-repeat;
+        }
       }
     }
   }
@@ -177,8 +185,8 @@
   &__container {}
   &__products {
     display: grid;
-    grid-template-columns: repeat(5, auto);
-    gap: 20px;
+    grid-template-columns: repeat(3, auto);
+    gap: 30px;
     @media (max-width: $md1){
       grid-template-columns: repeat(3, auto);
     }
@@ -254,6 +262,9 @@
     &:hover{
       @extend %greyBorder;
     }
+    &.hidden {
+      display: none;
+    }
   }
   &__title {
     text-align: center;
@@ -282,7 +293,7 @@
 
   }
   &__buttons {
-    flex: 0 1 50%;
+    flex: 0 1 110px;
     padding: 10px 10px;
   }
   &__button {

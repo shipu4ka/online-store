@@ -2,7 +2,7 @@ import Page from '../../models/templates/page';
 import * as noUiSlider from 'nouislider';
 import 'nouislider/dist/nouislider.css';
 import { PageIds } from '../../models/app/app';
-import { Filters, FiltersId } from '../../models/enums/filters';
+import { Filters, FiltersId, FiltersTitle } from '../../models/enums/filters';
 import { Product } from '../../models/interfaces/productsList';
 import { ObjInCart } from '../cart/cart';
 import { LocalStorageKey } from '../../models/enums/products';
@@ -22,20 +22,22 @@ class MainPage extends Page {
     super(id);
   }
 
-  createCategoriesBlock(parentClass: string, childClass: string, totalMod: string, data: string[]) {
+  createCategoriesBlock(parentClass: string, childClass: string, totalMod: string, checkboxMod: string, data: string[]) {
     const ul = this.createPageBlock('ul', parentClass);
 
     data.forEach((item) => {
       const elem = this.createPageBlock('li', childClass);
       const label = this.createPageBlock('label', 'filters__label');
+      label.dataset.active = 'true';
       const labelText = this.createPageBlock('span', 'filters__label-text');
       labelText.textContent = item;
 
-      const checkbox = this.createPageBlock('input', 'filters__checkbox');
+      const checkbox = this.createPageBlock('input', 'filters__checkbox', checkboxMod) as HTMLInputElement;
       checkbox.setAttribute('type', 'checkbox');
+      checkbox.value = item;
 
       const brandTotal = this.createPageBlock('span', 'filters__total', totalMod);
-      brandTotal.textContent = '0/0';
+      brandTotal.textContent = '0 / 1';
 
       label.append(...[checkbox, labelText]);
       elem.append(...[label, brandTotal]);
@@ -51,79 +53,32 @@ class MainPage extends Page {
     return title;
   }
 
-  async getProducts() {
-    const data = await this.getPageData();
-    return data.products;
-  }
-
-  async getCategories(filters: HTMLElement) {
-    const data = await this.getProductsCategories();
-    const filterContainer = this.createPageBlock('div', 'filters__container');
-    const title = this.createTitle('Category');
-    const categories = this.createCategoriesBlock('filters__categories', 'filters__category', 'filters__total-category', data);
-    filterContainer.append(...[title, categories]);
-    filters.append(...[filterContainer]);
-  }
-
-  async getBrand(filters: HTMLElement) {
-    const data = await this.getPageData();
-    const filterContainer = this.createPageBlock('div', 'filters__container');
-    const title = this.createTitle('Brand');
-    const dataProducts = data.products;
-    const arrDataProducts: string[] = [];
-
-    dataProducts.forEach((item) => {
-      const allBrands = item.brand.toLowerCase();
-      arrDataProducts.push(allBrands);
-    })
-
-    const uniqArrDataProducts = [...new Set(arrDataProducts)];
-    const brand = this.createCategoriesBlock('filters__brands', 'filters__brand', 'filters__total-brand', uniqArrDataProducts);
-
-
-    // const objDataProducts = arrDataProducts.map((name) => {
-    //   return {count: 0, name: name}
-    // });
-
-    // const uniq = objDataProducts.forEach((item, index) => {
-    //   if (item.name)
-    // })
-
-    // console.log(arrDataProducts);
-    // console.log(uniqArrDataProducts);
-    // console.log(objDataProducts);
-    // console.log(uniq);
-
-    filterContainer.append(...[title, brand]);
-    filters.append(...[filterContainer]);
-  }
-
-  createMultiRangeSlider(filters: HTMLElement, titleNode: string, min: string, max: string) {
-    const filterContainer = this.createPageBlock('div', 'filters__container');
+  createMultiRangeSlider(filters: HTMLElement, containerMod: string, titleNode: string, min: string, max: string, minId: string, maxId: string, sliderMod: string) {
+    const filterContainer = this.createPageBlock('div', 'filters__container', containerMod);
     const title = this.createTitle(titleNode);
     const slider = this.createPageBlock('div', 'filters__slider','slider');
-    const sliderBody  = this.createPageBlock('div', 'slider__body') as noUiSlider.target;
+    const sliderBody  = this.createPageBlock('div', 'slider__body', sliderMod) as noUiSlider.target;
     const inputs = this.createPageBlock('div', 'slider__inputs');
     const label1 = this.createPageBlock('label', 'slider__label');
     const span1 = this.createPageBlock('span', 'slider__text');
-    span1.textContent = 'min: $';
+    span1.textContent = 'min: ';
     const input1 = this.createPageBlock('input', 'slider__input') as HTMLInputElement;
     input1.setAttribute('type', 'number');
-    input1.setAttribute('min', min); //setup through promise
-    input1.setAttribute('max', max); //setup through promise
-    input1.setAttribute('value', min); //setup through promise
-    input1.setAttribute('placeholder', min); //setup through promise
-    input1.setAttribute('id', 'input1');
+    input1.setAttribute('min', min);
+    input1.setAttribute('max', max);
+    input1.setAttribute('value', min);
+    input1.setAttribute('placeholder', min);
+    input1.setAttribute('id', minId);
     const label2 = this.createPageBlock('label', 'slider__label');
     const span2 = this.createPageBlock('span', 'slider__text');
     const input2 = this.createPageBlock('input', 'slider__input') as HTMLInputElement;
     input2.setAttribute('type', 'number');
-    input2.setAttribute('min', min); //setup through promise
-    input2.setAttribute('max', max); //setup through promise
-    input2.setAttribute('value', max); //setup through promise
-    input2.setAttribute('placeholder', max); //setup through promise
-    input2.setAttribute('id', 'input2');
-    span2.textContent = 'max: $';
+    input2.setAttribute('min', min);
+    input2.setAttribute('max', max);
+    input2.setAttribute('value', max);
+    input2.setAttribute('placeholder', max);
+    input2.setAttribute('id', maxId);
+    span2.textContent = 'max: ';
 
     noUiSlider.create(sliderBody, {
       start: [min, max],
@@ -166,17 +121,624 @@ class MainPage extends Page {
     filters.append(...[filterContainer]);
   }
 
+  async getFiltersContent(filters: HTMLElement) {
+    const data = await this.getPageData();
+    const CategoriesData = await this.getProductsCategories();
+    const dataProducts = data.products;
+
+    //noUiSliders=====
+    const prices: number[] = [];
+    const stock: number[] = [];
+
+    dataProducts.forEach((item) => {
+      const itemPrice = item.price;
+      const itemStock = item.stock;
+      prices.push(itemPrice);
+      stock.push(itemStock);
+    });
+
+    prices.sort((a, b) => a - b);
+    stock.sort((a, b) => a - b);
+
+    const minPrice = prices[0].toString();
+    const maxPrice = prices[prices.length - 1].toString();
+    const minStock = stock[0].toString();
+    const maxStock = stock[prices.length - 1].toString();
+
+    this.createMultiRangeSlider(filters, 'filters__container-price', 'Price', minPrice, maxPrice, 'min-price', 'max-price', 'slider__body-price');
+    this.createMultiRangeSlider(filters, 'filters__container-stock', 'Stock', minStock, maxStock, 'min-stock', 'max-stock', 'slider__body-stock');
+
+    const sliderPrice  = document.querySelector('.filters__container-price') as HTMLElement;
+    const sliderStock  = document.querySelector('.filters__container-stock') as HTMLElement;
+    const sliderBodyPrice  = document.querySelector('.slider__body-price') as noUiSlider.target;
+    const sliderBodyStock  = document.querySelector('.slider__body-stock') as noUiSlider.target;
+    const cards = document.querySelectorAll('.products__card') as NodeListOf<HTMLElement>;    
+    const cardsTitle = document.querySelector('.cards__title ') as HTMLElement;    
+
+    const found = document.querySelector('.cards__found-info') as HTMLElement;
+
+    function showCards(matchArray: Array<Product["id"]>) {
+      if (matchArray.length === 0) {
+        cards.forEach(item => {
+          item.classList.add('hidden');
+        });
+
+        cardsTitle.textContent = FiltersTitle.NotFound;
+      } else {
+        cardsTitle.textContent = FiltersTitle.Sorted;
+        return cards.forEach(item => {
+          item.classList.remove('hidden');
+          let id = Number(item.dataset.id);
+          if (!matchArray.includes(id)) {
+            item.classList.add('hidden'); 
+          }
+        });
+      }
+    }
+
+    function setFoundInfo(matchArray: Array<Product["id"]>) {
+      if (matchArray.length === 0) {
+        found.textContent = '0';
+      }
+
+      if (found) {
+        const text = `${dataProducts.length}`;
+        if (matchArray.length === 0) {
+          found.textContent = text;
+        }
+        found.textContent = `${matchArray.length}`;
+      }
+    }
+
+    function getSliderDataPrice() {
+      if (sliderBodyPrice.noUiSlider ) {
+        const sliderValue = sliderBodyPrice.noUiSlider.get();
+        const minVal = +sliderValue[0 as unknown as keyof typeof sliderValue];
+        const maxVal = +sliderValue[1 as unknown as keyof typeof sliderValue];
+
+        const idArrPrice: Array<Product["id"]> = [];
+        const arrStockValues: Array<Product["stock"]> = [];
+
+        if(sliderBodyPrice) {
+          dataProducts.forEach((item) => {
+            const itemPrice = item.price;
+            if (itemPrice >= minVal && itemPrice <= maxVal) {
+              idArrPrice.push(item.id);
+              arrStockValues.push(item.stock);
+            }
+          });
+        }
+        
+        arrStockValues.sort((a, b) => a - b);
+        // console.log('price: ', idArrPrice);
+        // console.log('stock values sort: ', arrStockValues);
+        // if (sliderBodyStock.noUiSlider) {
+        //   sliderBodyStock.noUiSlider.set([arrStockValues[0], arrStockValues[arrStockValues.length - 1]]);
+        // }
+
+        return idArrPrice;
+      }
+    }
+
+    function getSliderDataStock() {
+      if (sliderBodyStock.noUiSlider ) {
+        const sliderValue = sliderBodyStock.noUiSlider.get();
+        const minVal = +sliderValue[0 as unknown as keyof typeof sliderValue];
+        const maxVal = +sliderValue[1 as unknown as keyof typeof sliderValue];
+
+        const idArrStock: Array<Product["id"]> = [];
+        const arrPriceValues: Array<Product["price"]> = [];
+        
+        if(sliderBodyStock) {
+          dataProducts.forEach((item) => {
+            const itemStock = item.stock;
+            if (itemStock >= minVal && itemStock <= maxVal) {
+              idArrStock.push(item.id);
+              arrPriceValues.push(item.price);
+            }
+          });
+        }
+        // console.log('stock: ', idArrStock);
+        // console.log('price values: ', arrPriceValues);
+        
+        return idArrStock;
+      }
+    }
+
+    function getSliderDataIds() {
+      const productsAmount = dataProducts.length;
+      const arrPrice = getSliderDataPrice();
+      const arrStock = getSliderDataStock();
+
+      let allIds: Array<Product["id"]> = [];
+
+      if (arrPrice && arrStock ) {
+        if (arrPrice.length === productsAmount 
+          && arrStock.length === productsAmount ) {
+
+          allIds.push(...arrPrice);
+
+        } else if (arrPrice.length !== productsAmount 
+          && arrStock.length !== productsAmount) {
+          
+          arrStock.forEach(item => {
+            if (arrPrice.includes(item)) {
+              allIds.push(item);
+            };
+          })
+
+        } else if (arrPrice.length !== productsAmount) {
+          allIds.push(...arrPrice);
+        } else if (arrStock.length !== productsAmount) {
+          allIds.push(...arrStock);
+        }
+      };
+
+      return allIds;
+    }
+
+    function setCards() {
+      const allSliderIds = getSliderDataIds();
+      let allIds: Array<Product["id"]> = [...allSliderIds];
+
+      showCards(allIds);
+      setFoundInfo(allIds);
+      setCategoriesToShow ();
+      setBrandsToShow();
+    }
+
+    sliderPrice.addEventListener('change', setCards);
+    sliderStock.addEventListener('change', setCards);
+    sliderPrice.addEventListener('click', setCards);
+    sliderStock.addEventListener('click', setCards);
+    
+    //categories=============================================================
+
+    const filterContainerCategories = this.createPageBlock('div', 'filters__container');
+    const CategoriesTitle = this.createTitle('Category');
+    const categories = this.createCategoriesBlock('filters__categories', 'filters__category', 'filters__total-category', 'filters__checkbox-category', CategoriesData);
+    filterContainerCategories.append(...[CategoriesTitle, categories]);
+    filters.append(...[filterContainerCategories]);
+
+    const arrCategoryProducts: string[] = [];
+
+    dataProducts.forEach((item) => {
+      const allCategories = item.category.toLowerCase();
+      arrCategoryProducts.push(allCategories);
+    })
+
+    const objCategoryProducts = CategoriesData.map((name) => {
+      return {count: 0, name: name}
+    });
+
+    for (let i = 0; i < arrCategoryProducts.length; i += 1) {
+      for (let j = 0; j < objCategoryProducts.length; j += 1) {
+        if (arrCategoryProducts[i] === objCategoryProducts[j].name) {
+          objCategoryProducts[j].count += 1;
+        }
+      }
+    }
+
+    const totalCategories = document.querySelectorAll('.filters__total-category');
+
+    function fillTotalCategories() {
+      for (let i = 0; i < objCategoryProducts.length; i += 1) {
+        totalCategories[i].textContent = `${objCategoryProducts[i].count} / ${objCategoryProducts[i].count}`;
+      }
+    }
+
+    fillTotalCategories();
+
+    const allCategories = document.querySelector('.filters__categories') as HTMLElement;
+    const checkboxCategoryList = document.querySelectorAll('.filters__checkbox-category') as NodeListOf<HTMLInputElement>;
+    
+    function styleCheckboxes(checkboxList: NodeListOf<HTMLInputElement>, arrCheckboxes: Array<Product["category"]> | Array<Product["brand"]>) {
+      checkboxList.forEach((item) => {
+        const inputLabel = item.parentElement;
+        const total = inputLabel?.nextElementSibling as HTMLElement;
+
+        if (inputLabel) {
+          if (!arrCheckboxes.includes(item.value)) {
+            inputLabel.style.opacity = '0.5';
+            inputLabel.dataset.active = 'false';
+            if (total) {
+              total.style.opacity = '0.5';
+            }
+
+          } else {
+            inputLabel.style.opacity = '1';
+            inputLabel.dataset.active = 'true';
+
+            if (total) {
+              total.style.opacity = '1';
+            }
+          }
+        }
+      });
+    }
+    
+    function getCategoriesData() {
+      const allCheckedCategories: Array<Product["category"]> = [];
+      const checkedCategoriesId: Array<Product["id"]> = [];
+
+      checkboxCategoryList.forEach((item) => {
+        const inputLabel = item.parentElement;
+        if (inputLabel) {
+          if (inputLabel.dataset.active === 'true' && item.checked) {
+            allCheckedCategories.push(item.value);
+          }
+        } 
+      });
+
+      dataProducts.filter((item) => {
+        const itemCategory = item.category.toLocaleLowerCase();
+        if(allCheckedCategories.includes(itemCategory)) {
+          checkedCategoriesId.push(item.id);
+        } 
+      });
+
+      return checkedCategoriesId;
+    }
+
+    function setCategoriesToShow () {
+      const allSliderIds = getSliderDataIds();
+      const categories: Array<Product["category"]> = [];
+
+      dataProducts.forEach((item) => {
+        if(allSliderIds.includes(item.id)) {
+          categories.push(item.category);
+        }
+      })
+
+      const categoriesObj = CategoriesData.map((name) => {
+        return {count: 0, name: name}
+      });
+
+      for (let i = 0; i < categories.length; i += 1) {
+        for (let j = 0; j < categoriesObj.length; j += 1) {
+          if (categories[i] === categoriesObj[j].name) {
+            categoriesObj[j].count += 1;
+          }
+        }
+      }
+
+      styleCheckboxes(checkboxCategoryList, categories);
+
+      for (let i = 0; i < objCategoryProducts.length; i += 1) {
+        totalCategories[i].textContent = `${categoriesObj[i].count} / ${objCategoryProducts[i].count}`;
+      }
+
+    }
+
+    function setCardsForCheckboxes() {
+      const sliderDataIds = getSliderDataIds();
+
+      const checkedBrandsId: Array<Product["id"]> = getBrandsData();
+      const checkedCategoriesId: Array<Product["id"]> = getCategoriesData();
+      const checkedIds: Array<Product["id"]> = [];
+
+      const [long, short] = checkedBrandsId.length > checkedCategoriesId.length ? [checkedBrandsId, checkedCategoriesId] : [checkedCategoriesId, checkedBrandsId];
+      short.sort((a, b) => a - b);
+      const shortLength = short.length;
+      
+      const binSearch = (needle: Product["id"]) => {
+        let start = 0, finish = shortLength - 1;
+        while (start <= finish) {
+          const center = Math.floor((start + finish) / 2);
+          if (short[center] < needle) start = center + 1;
+          else if (short[center] > needle) finish = center - 1;
+          else return true;
+        }
+        return false;
+      }
+
+      for (let i = 0; i < long.length; i += 1)
+        if (binSearch(long[i])) checkedIds.push(long[i]);
+
+      if (checkedBrandsId.length === 0 && checkedCategoriesId.length === 0) {
+        showCards(sliderDataIds);
+        setFoundInfo(sliderDataIds);
+      } else if (checkedBrandsId.length === 0) {
+        showCards(checkedCategoriesId);
+        setFoundInfo(checkedCategoriesId);
+      } else if (checkedCategoriesId.length === 0) {
+        showCards(checkedBrandsId);
+        setFoundInfo(checkedBrandsId);
+      } else if (checkedIds) {
+        showCards(checkedIds);
+        setFoundInfo(checkedIds);
+      } 
+    }
+
+    allCategories.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const sliderDataIds = getSliderDataIds();
+
+      if (target) {
+
+        if (target.closest('.filters__label')) {
+          const label = target.closest('.filters__label') as HTMLElement;
+          const checkbox = target.closest('.filters__checkbox-category') as HTMLInputElement;
+          
+          if (label) {
+            
+            if (label.dataset.active === 'false') {
+
+              if (checkbox.checked) {
+                cardsTitle.textContent = FiltersTitle.NotFound;
+                cards.forEach((item) => {
+                  item.classList.add('hidden');
+                })
+              } else {
+                setCards();
+              }
+
+            } else if (label.dataset.active === 'true') {
+
+              if (sliderDataIds.length === dataProducts.length) {
+                setCardsForCheckboxes();
+              } else {
+                showCheckedCheckboxesWithSliders();
+              }
+            }
+          }
+        }
+      }
+    });
+
+    //brands=========
+
+    const filterContainerBrand = this.createPageBlock('div', 'filters__container');
+    const brandTitle = this.createTitle('Brand');
+    const arrDataProducts: string[] = [];
+
+    dataProducts.forEach((item) => {
+      const allBrands = item.brand.toLowerCase();
+      arrDataProducts.push(allBrands);
+    })
+
+    const uniqArrDataProducts = [...new Set(arrDataProducts)];
+    const brand = this.createCategoriesBlock('filters__brands', 'filters__brand', 'filters__total-brand', 'filters__checkbox-brand', uniqArrDataProducts);
+
+
+    const objDataProducts = uniqArrDataProducts.map((name) => {
+      return {count: 0, name: name}
+    });
+
+    for (let i = 0; i < arrDataProducts.length; i += 1) {
+      for (let j = 0; j < objDataProducts.length; j += 1) {
+        if (arrDataProducts[i] === objDataProducts[j].name) {
+          objDataProducts[j].count += 1;
+        }
+      }
+    }
+
+    filterContainerBrand.append(...[brandTitle, brand]);
+    filters.append(...[filterContainerBrand]);
+
+    const totalBrands = document.querySelectorAll('.filters__total-brand');
+
+    function fillTotalBrand() {
+      for (let i = 0; i < objDataProducts.length; i += 1) {
+        totalBrands[i].textContent = `${objDataProducts[i].count} / ${objDataProducts[i].count}`;
+      }
+    }
+    fillTotalBrand();
+
+    const allBrands = document.querySelector('.filters__brands') as HTMLElement;
+    const checkboxBrandsList = document.querySelectorAll('.filters__checkbox-brand') as NodeListOf<HTMLInputElement>;
+
+    function getBrandsData() {
+      const allCheckedBrands: Array<Product["brand"]> = [];
+      const checkedBrandsId: Array<Product["id"]> = [];
+
+      checkboxBrandsList.forEach((item) => {
+        const inputLabel = item.parentElement;
+        if (inputLabel) {
+          if (inputLabel.dataset.active === 'true' && item.checked) {
+            allCheckedBrands.push(item.value);
+          }
+        } 
+      });
+
+      dataProducts.filter((item) => {
+        const itemCategory = item.brand.toLocaleLowerCase();
+        if(allCheckedBrands.includes(itemCategory)) {
+          checkedBrandsId.push(item.id);
+        } 
+      });
+      console.log(checkedBrandsId);
+
+      return checkedBrandsId;
+    }
+
+    function setBrandsToShow () {
+      const allSliderIds = getSliderDataIds();
+      const brands: Array<Product["brand"]> = [];
+
+      dataProducts.forEach((item) => {
+        if(allSliderIds.includes(item.id)) {
+          const brandToPush = (item.brand).toLocaleLowerCase();
+          brands.push(brandToPush);
+        }
+      })
+
+      const brandsObj = uniqArrDataProducts.map((name) => {
+        return {count: 0, name: name}
+      });
+
+      for (let i = 0; i < brands.length; i += 1) {
+        for (let j = 0; j < brandsObj.length; j += 1) {
+          if (brands[i] === brandsObj[j].name) {
+            brandsObj[j].count += 1;
+          }
+        }
+      }
+
+      styleCheckboxes(checkboxBrandsList, brands);
+
+      for (let i = 0; i < objDataProducts.length; i += 1) {
+        totalBrands[i].textContent = `${brandsObj[i].count} / ${objDataProducts[i].count}`;
+      }
+
+    }
+
+    allBrands.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const sliderDataIds = getSliderDataIds();
+
+      if (target) {
+
+        if (target.closest('.filters__label')) {
+          const label = target.closest('.filters__label') as HTMLElement;
+          const checkbox = target.closest('.filters__checkbox-brand') as HTMLInputElement;
+          
+          if (label) {
+            
+            if (label.dataset.active === 'false') {
+
+              if (checkbox.checked) {
+                cardsTitle.textContent = FiltersTitle.NotFound;
+                cards.forEach((item) => {
+                  item.classList.add('hidden');
+                })
+              } else {
+                setCards();
+              }
+
+            } else if (label.dataset.active === 'true') {
+
+              if (sliderDataIds.length === dataProducts.length) {
+                console.log(getBrandsData());
+                setCardsForCheckboxes();
+              } else {
+                // showCheckedBrandsWithSliders();
+                showCheckedCheckboxesWithSliders();
+              }
+            }
+          }
+        }
+      }
+
+    })
+
+    function showCheckedCheckboxesWithSliders() {
+      const activeCardsId = getSliderDataIds();
+      // const activeBrandCheckboxes: string[] = setActiveCheckboxes(checkboxBrandsList);
+      // const activeCategoryCheckboxes: string[] = setActiveCheckboxes(checkboxCategoryList);
+      const checkedBrandCheckboxes:string[] = setCheckedCheckboxes(checkboxBrandsList); 
+      const checkedCategoryCheckboxes:string[] = setCheckedCheckboxes(checkboxCategoryList);
+
+      //for localStorage
+        function setActiveCheckboxes(list: NodeListOf<HTMLInputElement>) {
+          const result: string[] = [];
+
+          list.forEach((item) => { //найти active чекбоксы
+            const label = item.parentElement;
+            if (label) {
+              if (label.dataset.active === 'true') {
+                result.push(item.value)
+              }
+            }
+          })
+
+          return result;
+        }
+
+        function setCheckedCheckboxes(list: NodeListOf<HTMLInputElement>) {
+          const result: string[] = [];
+
+          list.forEach((item) => { //найти active чекбоксы
+            const label = item.parentElement;
+            if (item.checked ) {
+              if (label) {
+                if (label.dataset.active === 'true') {
+                  result.push(item.value);
+                }
+              }
+            }
+          })
+
+          return result;
+        }
+
+        cards.forEach((item) => { //найти активные карточки
+
+          const id = Number(item.dataset.id);
+          const brand = item.dataset.brand;
+          const category = item.dataset.category;
+
+          if (activeCardsId.includes(id)) {
+            item.classList.remove('hidden');
+          }
+
+          checkedBrandCheckboxes.forEach((elem) => {
+            if (elem !== brand) {
+              item.classList.add('hidden');
+            }
+          })
+
+          checkedCategoryCheckboxes.forEach((elem) => {
+            if (elem !== category) {
+              item.classList.add('hidden');
+            }
+          })
+
+          if (brand && category) {
+            if (activeCardsId.includes(id) 
+              && (checkedBrandCheckboxes.includes(brand) || checkedCategoryCheckboxes.includes(category))) {
+              item.classList.remove('hidden');
+              console.log(item); //add items id to local storage
+            }
+          }
+
+        })
+      }
+
+      function resetFilters() {
+        const resetButton = document.querySelector('.filters__button-reset');
+        const labelsList = document.querySelectorAll('.filters__label') as NodeListOf<HTMLElement>;
+        const sort = document.querySelector('.sort');
+
+        function resetCategoriesStyles() {
+          labelsList.forEach((item) => {
+            item.dataset.active = 'true';
+            item.style.opacity = '1';
+            const total = item.nextElementSibling as HTMLElement;
+            total.style.opacity = '1';
+          })
+        }
+
+        if (resetButton) {
+          resetButton.addEventListener('click', () => {
+            if (sort) {
+              found.textContent = '100';
+            }
+            
+            fillTotalCategories();
+            fillTotalBrand();
+            for (let i = 0; i < objDataProducts.length; i += 1) {
+              totalBrands[i].textContent = `${objDataProducts[i].count} / ${objDataProducts[i].count}`;
+            }
+            resetCategoriesStyles();
+          })
+        }
+      }
+
+      resetFilters();
+  }
+
   async createFiltersButtons(buttons: HTMLElement) {
     const data = await this.getPageData();
     let products = data.products;
 
-    const btn1 = this.createPageBlock('button', 'filters__button');
-    btn1.textContent = 'Reset Filters';
-    const btn2 = this.createPageBlock('button', 'filters__button');
-    btn2.textContent = 'Copy Link';
-    buttons.append(...[btn1, btn2]);
+    const reset = this.createPageBlock('button', 'filters__button', 'filters__button-reset');
+    reset.textContent = 'Reset Filters';
+    const copy = this.createPageBlock('button', 'filters__button', 'filters__button-copy');
+    copy.textContent = 'Copy Link';
+    buttons.append(...[reset, copy]);
 
-    btn1.addEventListener('click', () => {
+    reset.addEventListener('click', () => {
       const cards = document.querySelector('.cards') as HTMLElement;
       cards.dataset.filter = Filters.Default;
 
@@ -190,15 +752,46 @@ class MainPage extends Page {
       cardsProducts.innerHTML = '';
       this.filterCards(products, cardsProducts);
 
+      const showButton = document.querySelector('.cards__show-button') as HTMLButtonElement;
+      showButton.textContent = 'Show More';
+      cardsProducts.style.gridTemplateColumns = 'repeat(3, auto)';
+
+      const sliderPrice = document.querySelector('.slider__body-price') as noUiSlider.target; 
+      const sliderStock = document.querySelector('.slider__body-stock') as noUiSlider.target;
+
+      if (sliderPrice.noUiSlider && sliderStock.noUiSlider) {
+        sliderPrice.noUiSlider.reset();
+        sliderStock.noUiSlider.reset();
+      }
+
+      function resetCategoryFilters() {
+        const checkboxCategoryList = document.querySelectorAll('.filters__checkbox-category') as NodeListOf<HTMLInputElement>;
+        checkboxCategoryList.forEach((item) => {
+          item.checked = false;
+        })
+      }
+
+      resetCategoryFilters();
+
       localStorage.removeItem('filter');
+      localStorage.removeItem('cards-view');
 
       const location =  window.location.href;
       const arrIdPage = location.split('#');
       const lastItem = arrIdPage[arrIdPage.length - 1];
 
-      if (lastItem !== 'main-page') {
+      if (lastItem !== 'main-page' && location.includes('#')) {
         window.location.href = location.replace(lastItem, 'main-page');
       }
+    })
+
+    copy.addEventListener('click', () => {
+      const link = window.location.href;
+      navigator.clipboard.writeText(link);
+
+      let text = copy.textContent;
+      copy.textContent = 'Copied!';
+      setTimeout(() => copy.textContent = text, 2000);
     })
 
     return buttons;
@@ -211,10 +804,7 @@ class MainPage extends Page {
     this.createFiltersButtons(buttons);
     filters.append(...[buttons]);
 
-    this.createMultiRangeSlider(filters, 'Price', '10', '1749');
-    this.createMultiRangeSlider(filters, 'Stock', '2', '150');
-    this.getCategories(filters);
-    this.getBrand(filters);
+    this.getFiltersContent(filters)
 
     return filters;
   }
@@ -281,10 +871,31 @@ class MainPage extends Page {
 
   createShowMore(sort: HTMLElement) {
     const show = this.createPageBlock('div', 'cards__show');
-    const showText = this.createPageBlock('div', 'cards__show-text');
-    showText.textContent = 'Show more';
-    show.append(...[showText]);
+    const showButton = this.createPageBlock('button', 'cards__show-button') as HTMLButtonElement;
+    showButton.textContent = 'Show More';
+    
+    show.append(...[showButton]);
     sort.append(...[show]);
+
+    function setShowCardsView(cards: HTMLElement) {
+      if (showButton.classList.contains('active')) {
+        showButton.textContent = 'Show Less';
+        cards.style.gridTemplateColumns = 'repeat(5, auto)';
+        localStorage.setItem('cards-view', JSON.stringify('showMore'));
+        //add query-params (use URLSearchParams)
+      } else {
+        showButton.textContent = 'Show More';
+        cards.style.gridTemplateColumns = 'repeat(3, auto)'
+        localStorage.setItem('cards-view', JSON.stringify('showLess'));
+        
+      }
+    }
+
+    showButton.addEventListener('click', () => {
+      showButton.classList.toggle('active');
+      const cardsProducts = document.querySelector('.cards__products') as HTMLElement;
+      setShowCardsView(cardsProducts);
+    })
   }
 
   createCardsSort(cards: HTMLElement) {
@@ -300,6 +911,11 @@ class MainPage extends Page {
   filterCards(product: Array<Product>, cardsProducts: HTMLElement) {
     return product.forEach((item) => {
       const card = this.createPageBlock('div', 'cards__card', 'products__card');
+      card.dataset.id = `${item.id}`;
+      let brand = (item.brand).toLowerCase();
+      let category = (item.category).toLowerCase();
+      card.dataset.brand = brand;
+      card.dataset.category = category;
       const cardTitle = this.createPageBlock('h3', 'products__title');
       cardTitle.textContent = item.title;
       const cardItems = this.createPageBlock('div', 'products__items');
@@ -313,7 +929,6 @@ class MainPage extends Page {
       cardPrice.textContent = `Price: $ ${item.price}`;
       const cardDiscount = this.createPageBlock('div', 'products__discount');
       cardDiscount.textContent = `Discount: ${item.discountPercentage}%`;
-
       const cardRating = this.createPageBlock('div', 'products__rating', 'rating');
       const cardRatingBody = this.createPageBlock('div', 'rating__body');
       const cardRatingActive = this.createPageBlock('div', 'rating__active');
@@ -390,8 +1005,19 @@ class MainPage extends Page {
     if(lastItem) {
       sortCards(lastItem);
     }
-    // console.log(location);
-    // console.log(arrIdPage);
+
+    
+    const cardsView = localStorage.getItem('cards-view');
+    if (cardsView) {
+      const showButton = document.querySelector('.cards__show-button') as HTMLButtonElement;
+      if (JSON.parse(cardsView) === 'showMore') {
+        cardsProducts.style.gridTemplateColumns = 'repeat(5, auto)';
+        showButton.textContent = 'Show Less';
+      } else {
+        cardsProducts.style.gridTemplateColumns = 'repeat(3, auto)';
+        showButton.textContent = 'Show More';
+      }
+    }
 
     const cardsFilter = localStorage.getItem('filter');
 
@@ -557,8 +1183,6 @@ class MainPage extends Page {
 
     mainWrapper.append(...[cards, filters]);
     this.main?.append(mainWrapper);
-
-    // this.getProducts();
 
     return this.main;
   }
